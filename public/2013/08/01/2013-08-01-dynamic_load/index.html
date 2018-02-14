@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    
+    <title>Custom Class Loading in Dalvik (译) | Alin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="原文链接 Dalvik虚拟机为开发者执行自定类加载提供了便利。除了从本地加载Dalvik可执行文件(“dex”),应用程序可以从备选地点如内部存储或者网络上加载它们。 这种技术不是适用每个应用程序的，事实上，大部分没有使用这种技术的也工作的很好。然而，有些情况下自定义类加载会得心应手。这里有一对情景： 巨大的应用程序包含超过64k个方法引用，超出了在一个dex文件里支持的最大值。为了绕过这个限制，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Custom Class Loading in Dalvik (译)">
+<meta property="og:url" content="http://yoursite.com/2013/08/01/2013-08-01-dynamic_load/index.html">
+<meta property="og:site_name" content="Alin Blog">
+<meta property="og:description" content="原文链接 Dalvik虚拟机为开发者执行自定类加载提供了便利。除了从本地加载Dalvik可执行文件(“dex”),应用程序可以从备选地点如内部存储或者网络上加载它们。 这种技术不是适用每个应用程序的，事实上，大部分没有使用这种技术的也工作的很好。然而，有些情况下自定义类加载会得心应手。这里有一对情景： 巨大的应用程序包含超过64k个方法引用，超出了在一个dex文件里支持的最大值。为了绕过这个限制，">
+<meta property="og:updated_time" content="2018-02-14T21:36:14.838Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Custom Class Loading in Dalvik (译)">
+<meta name="twitter:description" content="原文链接 Dalvik虚拟机为开发者执行自定类加载提供了便利。除了从本地加载Dalvik可执行文件(“dex”),应用程序可以从备选地点如内部存储或者网络上加载它们。 这种技术不是适用每个应用程序的，事实上，大部分没有使用这种技术的也工作的很好。然而，有些情况下自定义类加载会得心应手。这里有一对情景： 巨大的应用程序包含超过64k个方法引用，超出了在一个dex文件里支持的最大值。为了绕过这个限制，">
+    
+
+    
+        <link rel="alternate" href="/" title="Alin Blog" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Alin Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Entradas',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categorias',
+            TAGS: 'Etiquetas',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.png" />
+            <h2 id="name">阿霖</h2>
+            <h3 id="title">产品经理&amp;程序员</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Hangzhou, China</span>
+            <a id="follow" target="_blank" href="https://weibo.com/nvolume">SEGUIR</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                27
+                <span>Entradas</span>
+            </div>
+            <div class="article-info-block">
+                1
+                <span>Etiqueta</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/linkyan" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-2013-08-01-dynamic_load" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Custom Class Loading in Dalvik (译)
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2013/08/01/2013-08-01-dynamic_load/">
+            <time datetime="2013-07-31T16:00:00.000Z" itemprop="datePublished">2013-08-01</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+                        
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p><a href="http://android-developers.blogspot.com/2011/07/custom-class-loading-in-dalvik.html" target="_blank" rel="noopener">原文链接</a></p>
+<p>Dalvik虚拟机为开发者执行自定类加载提供了便利。除了从本地加载Dalvik可执行文件(“dex”),应用程序可以从备选地点如内部存储或者网络上加载它们。</p>
+<p>这种技术不是适用每个应用程序的，事实上，大部分没有使用这种技术的也工作的很好。然而，有些情况下自定义类加载会得心应手。这里有一对情景：</p>
+<p>巨大的应用程序包含超过64k个方法引用，超出了在一个dex文件里支持的最大值。为了绕过这个限制，开发者可以将这个程序分成多个二级dex文件，然后在运行时加载它们。</p>
+<p>开发者可以将它们的框架设计成执行逻辑具有很好的可扩展性，然后通过在运行时动态加载代码。</p>
+<p>我们已经创建了一个<a href="https://code.google.com/p/android-custom-class-loading-sample/" target="_blank" rel="noopener">应用</a>来演示分割的dex文件和运行时类加载。（请注意，在下面讨论的原因，应用不能用ADT Eclipse plug-in 构建，而使用包含其中的Ant构建脚本,详细查看Readme.txt）</p>
+<p>App有一个简单的Activity来调用一个类库组件以显示一个Toast.Activity和它的资源包含在默认的dex中，而类库代码是被存储在二级dex中并绑定在APK。这需要一个修改的构建过程，也就是接下来将详细展示的。</p>
+<p>在类方法可以被调用前，App首先必须明确地加载二级dex文件。让我们看看这些相关的moving parts</p>
+<h2 id="代码组织"><a href="#代码组织" class="headerlink" title="##代码组织"></a>##代码组织</h2><p>应用包含3个类</p>
+<p>com.example.dex.MainActivity: UI component from which the library is invoked</p>
+<p>com.example.dex.LibraryInterface: Interface definition for the library</p>
+<p>com.example.dex.lib.LibraryProvider: Implementation of the library</p>
+<p>类库被打包在一个二级dex中，而其余类包含在默认（主要的）dex文件中，“Build Process”章节说明了如何完成它。当然，打包策略依赖于特殊场景–开发者正要处理的问题。</p>
+<h2 id="类加载和方法调用"><a href="#类加载和方法调用" class="headerlink" title="##类加载和方法调用"></a>##类加载和方法调用</h2><p>二级dex文件–含有LibraryProvider,存储为App的asset。首先，它必须拷贝到一个路径能被类加载器访问到的存储位置。示例App使用了App的私有内部存储空间做到了这点。（从技术上来说，外部存储也可以，但要考虑到将App二进制文件保存在那里的安全性问题）</p>
+<p>下面片段来自MainActivity–使用标准文件I/O完成拷贝工作</p>
+<pre><code>// Before the secondary dex file can be processed by the DexClassLoader,
+  // it has to be first copied from asset resource to a storage location.
+  File dexInternalStoragePath = new File(getDir(&quot;dex&quot;, Context.MODE_PRIVATE),
+      SECONDARY_DEX_NAME);
+  ...
+  BufferedInputStream bis = null;
+  OutputStream dexWriter = null；
+  static final int BUF_SIZE = 8 * 1024;
+  try {
+  bis = new BufferedInputStream(getAssets().open(SECONDARY_DEX_NAME));
+  dexWriter = new BufferedOutputStream(
+      new FileOutputStream(dexInternalStoragePath));
+  byte[] buf = new byte[BUF_SIZE];
+  int len;
+  while((len = bis.read(buf, 0, BUF_SIZE)) &gt; 0) {
+      dexWriter.write(buf, 0, len);
+  }
+  dexWriter.close();
+  bis.close();
+  } catch (. . .) {...}
+</code></pre><p>接着，DexClassLoader被实例化去加载来自提取出来的二级dex文件的类库。有两种方式去调用加载了的类方法以这种方式。在示例中，类实例转换成接口，然后直接调用方法。</p>
+<p>另一个途径是使用反射API调用方法。使用反射的优点是它不要求二级dex文件去实现任何特殊的接口，然而你应该察觉到反射很啰嗦而且慢。</p>
+<pre><code>// Internal storage where the DexClassLoader writes the optimized dex file to
+final File optimizedDexOutputPath = getDir(&quot;outdex&quot;, Context.MODE_PRIVATE);
+
+DexClassLoader cl = new DexClassLoader(dexInternalStoragePath.getAbsolutePath(),
+                                   optimizedDexOutputPath.getAbsolutePath(),
+                                   null,
+                                   getClassLoader());
+Class libProviderClazz = null;
+try {
+    // Load the library.
+    libProviderClazz =
+    cl.loadClass(&quot;com.example.dex.lib.LibraryProvider&quot;);
+    // Cast the return object to the library interface so that the
+    // caller can directly invoke methods in the interface.
+    // Alternatively, the caller can invoke methods through reflection,
+    // which is more verbose.
+    LibraryInterface lib = (LibraryInterface) libProviderClazz.newInstance();
+    lib.showAwesomeToast(this, &quot;hello&quot;);
+} catch (Exception e) { ... }
+</code></pre><h2 id="构建过程"><a href="#构建过程" class="headerlink" title="##构建过程"></a>##构建过程</h2><p>为了churn out 两个分开的dex文件，我们需要tweak标准的构建过程。完成这个戏法，我们只要简单地修改”-dex”目标，在项目的Ant build.xml中。</p>
+<p>修改了的”-dex”目标执行以下操作：</p>
+<p>创建两个临时目录去存储.class文件，用来被转换为默认的dex和二级dex。</p>
+<p>有选择性的从Project_Root/bin/classes拷贝.class文件到这两个临时目录。</p>
+<pre><code>&lt;!-- Primary dex to include everything but the concrete library
+           implementation. --&gt;
+      &lt;copy todir=&quot;${out.classes.absolute.dir}.1&quot; &gt;
+          &lt;fileset dir=&quot;${out.classes.absolute.dir}&quot; &gt;
+                  &lt;exclude name=&quot;com/example/dex/lib/**&quot; /&gt;
+          &lt;/fileset&gt;
+      &lt;/copy&gt;
+      &lt;!-- Secondary dex to include the concrete library implementation. --&gt;
+      &lt;copy todir=&quot;${out.classes.absolute.dir}.2&quot; &gt;
+          &lt;fileset dir=&quot;${out.classes.absolute.dir}&quot; &gt;
+                  &lt;include name=&quot;com/example/dex/lib/**&quot; /&gt;
+          &lt;/fileset&gt;
+      &lt;/copy&gt;     
+</code></pre><p>将两个临时目录的.class文件转换成两个分开的dex文件</p>
+<p>添加二级dex文件到一个jar文件–DexClassLoader的预期输入格式。最后，存储jar文件到项目的assets目录下。</p>
+<pre><code>&lt;!-- Package the output in the assets directory of the apk. --&gt;
+        &lt;jar destfile=&quot;${asset.absolute.dir}/secondary_dex.jar&quot;
+               basedir=&quot;${out.absolute.dir}/secondary_dex_dir&quot;
+               includes=&quot;classes.dex&quot; /&gt;
+</code></pre><p>To kick-off the build, you execute ant debug (or release) from the project root directory.</p>
+<p>That’s it! In the right situations, dynamic class loading can be quite useful.</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2013/08/01/2013-08-01-dynamic_load/" data-id="cjdnn3tlv0018rpfy95qkya5j" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2013/10/30/2013-10-30-display-gif/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más nuevo</strong>
+            <div class="article-nav-title">
+                
+                    Android中显示动画的GIF-Movie类解决方案
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2013/06/19/2013-06-19-viewpage-intercept/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más viejo</strong>
+            <div class="article-nav-title">ViewPager TouchEvent流程源码分析</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Recientes</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/2017年年终总结/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/2017年年终总结/" class="title">2017年年终总结</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T21:59:27.000Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/hello-world/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/hello-world/" class="title">Hello World</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T20:49:39.472Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/11/28/2013-11-28-picasso/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/11/28/2013-11-28-picasso/" class="title">Android Picasso-强大的图片下载缓存类库</a></p>
+                            <p class="item-date"><time datetime="2013-11-27T16:00:00.000Z" itemprop="datePublished">2013-11-28</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/10/30/2013-10-30-display-gif/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/10/30/2013-10-30-display-gif/" class="title">Android中显示动画的GIF-Movie类解决方案</a></p>
+                            <p class="item-date"><time datetime="2013-10-29T16:00:00.000Z" itemprop="datePublished">2013-10-30</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/08/01/2013-08-01-dynamic_load/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/08/01/2013-08-01-dynamic_load/" class="title">Custom Class Loading in Dalvik (译)</a></p>
+                            <p class="item-date"><time datetime="2013-07-31T16:00:00.000Z" itemprop="datePublished">2013-08-01</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Categorias</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">25</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Archivos</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a><span class="archive-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Etiquetas</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Nube de etiquetas</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/work/" style="font-size: 10px;">work</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">Links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Alin<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

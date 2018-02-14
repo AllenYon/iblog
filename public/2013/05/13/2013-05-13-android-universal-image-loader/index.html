@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    
+    <title>介绍开源项目 Android-Universal-Image-Loader -Part 1 | Alin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="Github地址：Android-Universal-Image-Loader 万能的图片加载器!作者：nostra13 废话不多开始介绍 This project aims to provide a reusable instrument for asynchronous image loading, caching and displaying. It is originally based">
+<meta property="og:type" content="article">
+<meta property="og:title" content="介绍开源项目 Android-Universal-Image-Loader -Part 1">
+<meta property="og:url" content="http://yoursite.com/2013/05/13/2013-05-13-android-universal-image-loader/index.html">
+<meta property="og:site_name" content="Alin Blog">
+<meta property="og:description" content="Github地址：Android-Universal-Image-Loader 万能的图片加载器!作者：nostra13 废话不多开始介绍 This project aims to provide a reusable instrument for asynchronous image loading, caching and displaying. It is originally based">
+<meta property="og:updated_time" content="2018-02-14T21:36:14.831Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="介绍开源项目 Android-Universal-Image-Loader -Part 1">
+<meta name="twitter:description" content="Github地址：Android-Universal-Image-Loader 万能的图片加载器!作者：nostra13 废话不多开始介绍 This project aims to provide a reusable instrument for asynchronous image loading, caching and displaying. It is originally based">
+    
+
+    
+        <link rel="alternate" href="/" title="Alin Blog" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Alin Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Entradas',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categorias',
+            TAGS: 'Etiquetas',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.png" />
+            <h2 id="name">阿霖</h2>
+            <h3 id="title">产品经理&amp;程序员</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Hangzhou, China</span>
+            <a id="follow" target="_blank" href="https://weibo.com/nvolume">SEGUIR</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                27
+                <span>Entradas</span>
+            </div>
+            <div class="article-info-block">
+                1
+                <span>Etiqueta</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/linkyan" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-2013-05-13-android-universal-image-loader" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            介绍开源项目 Android-Universal-Image-Loader -Part 1
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2013/05/13/2013-05-13-android-universal-image-loader/">
+            <time datetime="2013-05-12T16:00:00.000Z" itemprop="datePublished">2013-05-13</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+                        
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>Github地址：<a href="https://github.com/nostra13/Android-Universal-Image-Loader" target="_blank" rel="noopener">Android-Universal-Image-Loader</a> 万能的图片加载器!<br>作者：<a href="https://github.com/nostra13" target="_blank" rel="noopener">nostra13</a></p>
+<p>废话不多开始介绍</p>
+<p>This project aims to provide a reusable instrument for asynchronous image loading, caching and displaying. It is originally based on Fedor Vlasov’s project and has been vastly refactored and improved since then.</p>
+<p>作者说他也是<a href="https://github.com/thest1/LazyList" target="_blank" rel="noopener">Fedor Vlasov’s project</a>这个项目改写过来的，做到对图片的异步加载，缓存和显示。</p>
+<p>##特性</p>
+<ul>
+<li>多线程图片加载</li>
+<li>尽可能多的配置选项（线程池，加载器，解析器，内存/磁盘缓存，显示参数等等）</li>
+<li>图片可以缓存在内存中，或者设备文件目录下，或者SD卡中</li>
+<li>可以监听加载进度</li>
+<li>可以自定义显示每一张图片时都带不同参数</li>
+<li>支持Widget</li>
+</ul>
+<h2 id="Quick-Setup"><a href="#Quick-Setup" class="headerlink" title="Quick Setup"></a>Quick Setup</h2><h3 id="1-Include-library"><a href="#1-Include-library" class="headerlink" title="1.Include library"></a>1.Include library</h3><p><a href="https://github.com/nostra13/Android-Universal-Image-Loader/raw/master/downloads/universal-image-loader-1.8.4-with-sources.jar" target="_blank" rel="noopener">下载连接 JAR</a></p>
+<h3 id="2-Android-Manifest"><a href="#2-Android-Manifest" class="headerlink" title="2.Android Manifest"></a>2.Android Manifest</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&lt;manifest&gt;</span><br><span class="line">    &lt;uses-permission android:name=&quot;android.permission.INTERNET&quot; /&gt;</span><br><span class="line">    &lt;!-- Include next permission if you want to allow UIL to cache images on SD card --&gt;</span><br><span class="line">    &lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot; /&gt;</span><br><span class="line">    ...</span><br><span class="line">    &lt;application android:name=&quot;MyApplication&quot;&gt;</span><br><span class="line">        ...</span><br><span class="line">    &lt;/application&gt;</span><br><span class="line">&lt;/manifest&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="3-Application-class"><a href="#3-Application-class" class="headerlink" title="3. Application class"></a>3. Application class</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">public class MyApplication extends Application &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onCreate() &#123;</span><br><span class="line">        super.onCreate();</span><br><span class="line">        // Create global configuration and initialize ImageLoader with this configuration</span><br><span class="line">        ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())</span><br><span class="line">            ...</span><br><span class="line">            .build();</span><br><span class="line">        ImageLoader.getInstance().init(config);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="Configuration-and-Display-Options"><a href="#Configuration-and-Display-Options" class="headerlink" title="Configuration and Display Options"></a>Configuration and Display Options</h2><ul>
+<li>Configuration(ImageLoaderConfiguration) 是相对于整个应用的配置</li>
+<li>Display Options(DisplayImageOptions)是针对每一个显示图片任务所提供的参数(ImageLoader.displayImage(…)).</li>
+</ul>
+<h3 id="Configuration"><a href="#Configuration" class="headerlink" title="Configuration"></a>Configuration</h3><p>所有的选项都是可选的，只选择你真正想制定的去配置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">// DON&apos;T COPY THIS CODE TO YOUR PROJECT! This is just example of ALL options using.</span><br><span class="line">File cacheDir = StorageUtils.getCacheDirectory(context);</span><br><span class="line">ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(context)</span><br><span class="line">		//如果图片尺寸大于了这个参数，那么就会这按照这个参数对图片大小进行限制并缓存</span><br><span class="line">        .memoryCacheExtraOptions(480, 800) // default=device screen dimensions</span><br><span class="line">        .discCacheExtraOptions(480, 800, CompressFormat.JPEG, 75)</span><br><span class="line">        .taskExecutor(AsyncTask.THREAD_POOL_EXECUTOR)</span><br><span class="line">        .taskExecutorForCachedImages(AsyncTask.THREAD_POOL_EXECUTOR)</span><br><span class="line">        .threadPoolSize(3) // default</span><br><span class="line">        .threadPriority(Thread.NORM_PRIORITY - 1) // default</span><br><span class="line">        .tasksProcessingOrder(QueueProcessingType.FIFO) // default</span><br><span class="line">        .denyCacheImageMultipleSizesInMemory()</span><br><span class="line">        .memoryCache(new LruMemoryCache(2 * 1024 * 1024))</span><br><span class="line">        .memoryCacheSize(2 * 1024 * 1024)</span><br><span class="line">        .discCache(new UnlimitedDiscCache(cacheDir)) // default</span><br><span class="line">        .discCacheSize(50 * 1024 * 1024)</span><br><span class="line">        .discCacheFileCount(100)</span><br><span class="line">        .discCacheFileNameGenerator(new HashCodeFileNameGenerator()) // default</span><br><span class="line">        .imageDownloader(new BaseImageDownloader(context)) // default</span><br><span class="line">        .imageDecoder(new BaseImageDecoder()) // default</span><br><span class="line">        .defaultDisplayImageOptions(DisplayImageOptions.createSimple()) // default</span><br><span class="line">        .enableLogging()</span><br><span class="line">        .build();</span><br></pre></td></tr></table></figure>
+<p>参数主要包括了这么几类配置</p>
+<ol>
+<li>线程池配置</li>
+<li>内存缓存配置</li>
+<li>磁盘缓存配置</li>
+<li>使用哪个图片下载器</li>
+<li>使用哪个图片解析器<br>实际上，不做任何配置也是ImageLoader也是可以使用的。<br>插一句，配置选项的确够丰富，但有多是没有必要的。</li>
+</ol>
+<h3 id="Display-Options"><a href="#Display-Options" class="headerlink" title="Display Options"></a>Display Options</h3><p>显示参数可以分别被每一个显示任务调用(ImageLoader.displayImage(…))</p>
+<p>Note:<strong>如果没有调用ImageLoader.displayImage(…),那么将使用配置选项中的默认显示参数(ImageLoaderConfiguration.defaultDisplayImageOptions(…))</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">DisplayImageOptions options = new DisplayImageOptions.Builder()</span><br><span class="line">        .showStubImage(R.drawable.ic_stub)  // 在显示真正的图片前，会加载这个资源</span><br><span class="line">        .showImageForEmptyUri(R.drawable.ic_empty) //空的Url时</span><br><span class="line">        .showImageOnFail(R.drawable.ic_error)</span><br><span class="line">        .resetViewBeforeLoading() //</span><br><span class="line">        .delayBeforeLoading(1000)     // 延长1000ms 加载图片  （想不出来用在什么场景下）</span><br><span class="line">        .cacheInMemory()              </span><br><span class="line">        .cacheOnDisc()               </span><br><span class="line">        .preProcessor(...)            </span><br><span class="line">        .postProcessor(...)           </span><br><span class="line">        .extraForDownloader(...)      //可以向加载器携带一些参数</span><br><span class="line">        .imageScaleType(ImageScaleType.IN_SAMPLE_POWER_OF_2) // default  </span><br><span class="line">        .bitmapConfig(Bitmap.Config.ARGB_8888) // default</span><br><span class="line">        .decodingOptions(...)</span><br><span class="line">        .displayer(new SimpleBitmapDisplayer()) // default</span><br><span class="line">        .handler(new Handler()) // default</span><br><span class="line">        .build();</span><br></pre></td></tr></table></figure>
+<h2 id="用法"><a href="#用法" class="headerlink" title="用法"></a>用法</h2><h3 id="可接收的URL"><a href="#可接收的URL" class="headerlink" title="可接收的URL"></a>可接收的URL</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">String imageUri = &quot;http://site.com/image.png&quot;; // from Web</span><br><span class="line">String imageUri = &quot;file:///mnt/sdcard/image.png&quot;; // from SD card</span><br><span class="line">String imageUri = &quot;content://media/external/audio/albumart/13&quot;; // from content provider</span><br><span class="line">String imageUri = &quot;assets://image.png&quot;; // from assets</span><br><span class="line">String imageUri = &quot;drawable://&quot; + R.drawable.image; // from drawables (only imag</span><br><span class="line">es, non-9patch)</span><br></pre></td></tr></table></figure>
+<p>###例子<br><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// Load image, decode it to Bitmap and display Bitmap in ImageView</span><br><span class="line">imageLoader.displayImage(imageUri, imageView);</span><br></pre></td></tr></table></figure></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">// Load image, decode it to Bitmap and return Bitmap to callback</span><br><span class="line">imageLoader.loadImage(imageUri, new SimpleImageLoadingListener() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) &#123;</span><br><span class="line">        // Do whatever you want with Bitmap</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<h3 id="完整版"><a href="#完整版" class="headerlink" title="完整版"></a>完整版</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">// Load image, decode it to Bitmap and display Bitmap in ImageView</span><br><span class="line">imageLoader.displayImage(imageUri, imageView, displayOptions, new ImageLoadingListener() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onLoadingStarted(String imageUri, View view) &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void onLoadingFailed(String imageUri, View view, FailReason failReason) &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void onLoadingCancelled(String imageUri, View view) &#123;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ImageSize targetSize = new ImageSize(120, 80); // result Bitmap will be fit to this size</span><br><span class="line">imageLoader.loadImage(imageUri, targetSize, displayOptions, new SimpleImageLoadingListener() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) &#123;</span><br><span class="line">        // Do whatever you want with Bitmap</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>###ImageLoader Helpers<br>一些可能会用到的帮助类和方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">ImageLoader |</span><br><span class="line">            | - getMemoryCache()</span><br><span class="line">            | - clearMemoryCache()</span><br><span class="line">            | - getDiscCache()</span><br><span class="line">            | - clearDiscCache()</span><br><span class="line">            | - denyNetworkDownloads(boolean)</span><br><span class="line">            | - handleSlowNetwork(boolean)</span><br><span class="line">            | - pause()</span><br><span class="line">            | - resume()</span><br><span class="line">            | - stop()</span><br><span class="line">            | - destroy()</span><br><span class="line">            | - getLoadingUriForView(ImageView)</span><br><span class="line">            | - cancelDisplayTask(ImageView)</span><br><span class="line">MemoryCacheUtil |</span><br><span class="line">                | - findCachedBitmapsForImageUri(...)</span><br><span class="line">                | - findCacheKeysForImageUri(...)</span><br><span class="line">                | - removeFromCache(...)</span><br><span class="line">DiscCacheUtil |</span><br><span class="line">              | - findInCache(...)</span><br><span class="line">              | - removeFromCache(...)</span><br><span class="line">StorageUtils |</span><br><span class="line">             | - getCacheDirectory(Context)</span><br><span class="line">             | - getIndividualCacheDirectory(Context)</span><br><span class="line">             | - getOwnCacheDirectory(Context, String)</span><br><span class="line">PauseOnScrollListener</span><br></pre></td></tr></table></figure>
+<h2 id="Useful-Info"><a href="#Useful-Info" class="headerlink" title="Useful Info"></a>Useful Info</h2><p>1.使用默认值时缓存无效。如果你想要加载图片的时候使用内存/磁盘中的缓存，那么你应该这样设置DisplayImageOptions:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// Create default options which will be used for every</span><br><span class="line">//  displayImage(...) call if no options will be passed to this method</span><br><span class="line">DisplayImageOptions defaultOptions = new DisplayImageOptions.Builder()</span><br><span class="line">        ...</span><br><span class="line">        .cacheInMemory()</span><br><span class="line">        .cacheOnDisc()</span><br><span class="line">        ...</span><br><span class="line">        .build();</span><br><span class="line">ImageLoaderConfiguration config = new ImageLoaderConfiguration.Builder(getApplicationContext())</span><br><span class="line">        ...</span><br><span class="line">        .defaultDisplayImageOptions(defaultOptions)</span><br><span class="line">        ...</span><br><span class="line">        .build();</span><br><span class="line">ImageLoader.getInstance().init(config); // Do it on Application start</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">// Then later, when you want to display image</span><br><span class="line">ImageLoader.getInstance().displayImage(imageUrl, imageView); // Default options will be used</span><br></pre></td></tr></table></figure>
+<p>或者这样:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">DisplayImageOptions options = new DisplayImageOptions.Builder()</span><br><span class="line">        ...</span><br><span class="line">        .cacheInMemory()</span><br><span class="line">        .cacheOnDisc()</span><br><span class="line">        ...</span><br><span class="line">        .build();</span><br><span class="line">ImageLoader.getInstance().displayImage(imageUrl, imageView, options); // Incoming options will be used</span><br></pre></td></tr></table></figure>
+<p>2.如果你允许缓存在磁盘中，那么UIL将尝试缓存到(/sdcard/Android/data/[package_name]/cache)路径中。如果外部存储不可用的话，图片将缓存在设备文件系统下。为了支持在外部存储(SD card）中缓存,那么应该在AndroidManifest.xml中加上这个权限:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;uses-permission android:name=&quot;android.permission.WRITE_EXTERNAL_STORAGE&quot;/&gt;</span><br></pre></td></tr></table></figure>
+<p>3.UIL如果知道Bitmap应该有多大的尺寸放在确定了点ImageView中？它搜索以下几个定义的参数：</p>
+<ul>
+<li>从ImageView测量准确的高和宽获得</li>
+<li>从android:layout_width 和 android:layout_height 参数获得</li>
+<li>从 android:maxWidth 和/或者 android:maxHeight 参数获得</li>
+<li>从在configuration定义的maximun width 和/或者 height参数获得</li>
+<li>从设备屏幕 width 和/或者 height 获得</li>
+</ul>
+<p>If you often got OutOfMemoryError in your app using Universal Image Loader then try next (all of them or several):</p>
+<ul>
+<li>Reduce thread pool size in configuration (.threadPoolSize(…)). 1 - 5 is recommended.</li>
+<li>Use .bitmapConfig(Bitmap.Config.RGB_565) in display options. Bitmaps in RGB_565 consume 2 times less memory than in ARGB_8888.</li>
+<li>Use .memoryCache(new WeakMemoryCache()) in configuration or disable caching in memory at all in display options (don’t call .cacheInMemory()).</li>
+<li>Use .imageScaleType(ImageScaleType.IN_SAMPLE_INT) in display options. Or try .imageScaleType(ImageScaleType.EXACTLY).</li>
+<li>Avoid using RoundedBitmapDisplayer. It creates new Bitmap object with ARGB_8888 config for displaying during work.</li>
+</ul>
+<p>5.For memory cache configuration (ImageLoaderConfiguration.memoryCache(…)) you can use already prepared implementations.</p>
+<ul>
+<li>Cache using only strong references:<br>LruMemoryCache (Least recently used bitmap is deleted when cache size limit is exceeded) - Used by default for API &gt;= 9</li>
+<li>Caches using weak and strong references:<br>UsingFreqLimitedMemoryCache (Least frequently used bitmap is deleted when cache size limit is exceeded)<br>LRULimitedMemoryCache (Least recently used bitmap is deleted when cache size limit is exceeded) - Used by default for API &lt; 9<br>FIFOLimitedMemoryCache (FIFO rule is used for deletion when cache size limit is exceeded)<br>LargestLimitedMemoryCache (The largest bitmap is deleted when cache size limit is exceeded)<br>LimitedAgeMemoryCache (Decorator. Cached object is deleted when its age exceeds defined value)</li>
+<li>Cache using only weak references:<br>WeakMemoryCache (Unlimited cache)</li>
+</ul>
+<p>6.For disc cache configuration (ImageLoaderConfiguration.discCache(…)) you can use already prepared implementations:</p>
+<ul>
+<li>UnlimitedDiscCache (The fastest cache, doesn’t limit cache size) - Used by default</li>
+<li>TotalSizeLimitedDiscCache (Cache limited by total cache size. If cache size exceeds specified limit then file with the most oldest last usage date will be deleted)</li>
+<li>FileCountLimitedDiscCache (Cache limited by file count. If file count in cache directory exceeds specified limit then file with the most oldest last usage date will be deleted. Use it if your cached files are of about the same size.)</li>
+<li>LimitedAgeDiscCache (Size-unlimited cache with limited files’ lifetime. If age of cached file exceeds defined limit then it will be deleted from cache.)<br><strong>NOTE: UnlimitedDiscCache is 30%-faster than other limited disc cache implementations.</strong></li>
+</ul>
+<p>7.To display bitmap (DisplayImageOptions.displayer(…)) you can use already prepared implementations:</p>
+<ul>
+<li>RoundedBitmapDisplayer (Displays bitmap with rounded corners)</li>
+<li>FadeInBitmapDisplayer (Displays image with “fade in” animation)</li>
+</ul>
+<p>8.To avoid list (grid, …) scrolling lags you can use PauseOnScrollListener:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">boolean pauseOnScroll = false; // or true</span><br><span class="line">boolean pauseOnFling = true; // or false</span><br><span class="line">PauseOnScrollListener listener = new PauseOnScrollListener(imageLoader, pauseOnScroll, pauseOnFling);</span><br><span class="line">listView.setOnScrollListener(listener);</span><br></pre></td></tr></table></figure>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2013/05/13/2013-05-13-android-universal-image-loader/" data-id="cjdnn3tkl0008rpfydn76qa5q" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2013/05/14/2013-05-14-lifealgorithm/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más nuevo</strong>
+            <div class="article-nav-title">
+                
+                    程序算法与人生选择
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2013/05/11/2013-05-11-custom-adapterview/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más viejo</strong>
+            <div class="article-nav-title">创建属于你自己的3D ListView - Part 1(译)</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Recientes</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/2017年年终总结/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/2017年年终总结/" class="title">2017年年终总结</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T21:59:27.000Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/hello-world/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/hello-world/" class="title">Hello World</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T20:49:39.472Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/11/28/2013-11-28-picasso/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/11/28/2013-11-28-picasso/" class="title">Android Picasso-强大的图片下载缓存类库</a></p>
+                            <p class="item-date"><time datetime="2013-11-27T16:00:00.000Z" itemprop="datePublished">2013-11-28</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/10/30/2013-10-30-display-gif/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/10/30/2013-10-30-display-gif/" class="title">Android中显示动画的GIF-Movie类解决方案</a></p>
+                            <p class="item-date"><time datetime="2013-10-29T16:00:00.000Z" itemprop="datePublished">2013-10-30</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/08/01/2013-08-01-dynamic_load/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/08/01/2013-08-01-dynamic_load/" class="title">Custom Class Loading in Dalvik (译)</a></p>
+                            <p class="item-date"><time datetime="2013-07-31T16:00:00.000Z" itemprop="datePublished">2013-08-01</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Categorias</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">25</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Archivos</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a><span class="archive-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Etiquetas</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Nube de etiquetas</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/work/" style="font-size: 10px;">work</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">Links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Alin<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

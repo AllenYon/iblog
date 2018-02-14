@@ -1,0 +1,582 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    
+    <title>检测常见的手势 （译文） | Alin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="一个触摸手势发生在一个用户将一个或多个手指放在触摸屏上，然后你的应用将这些触摸事件(pattern)翻译为一个具体的手势。有两个相应的阶段去作手势检测:  收集关于触摸事件的数据. 解释(interperting)这些数据，看它是否符合你的应用程序所支持的手势的标准(criteria).  支持包/类本课程中的示例使用了GestureDetectorCompat 和MotionEventCompa">
+<meta property="og:type" content="article">
+<meta property="og:title" content="检测常见的手势 （译文）">
+<meta property="og:url" content="http://yoursite.com/2013/05/10/2013-05-10-Detecting-Common-Gestures/index.html">
+<meta property="og:site_name" content="Alin Blog">
+<meta property="og:description" content="一个触摸手势发生在一个用户将一个或多个手指放在触摸屏上，然后你的应用将这些触摸事件(pattern)翻译为一个具体的手势。有两个相应的阶段去作手势检测:  收集关于触摸事件的数据. 解释(interperting)这些数据，看它是否符合你的应用程序所支持的手势的标准(criteria).  支持包/类本课程中的示例使用了GestureDetectorCompat 和MotionEventCompa">
+<meta property="og:updated_time" content="2018-02-14T21:36:14.829Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="检测常见的手势 （译文）">
+<meta name="twitter:description" content="一个触摸手势发生在一个用户将一个或多个手指放在触摸屏上，然后你的应用将这些触摸事件(pattern)翻译为一个具体的手势。有两个相应的阶段去作手势检测:  收集关于触摸事件的数据. 解释(interperting)这些数据，看它是否符合你的应用程序所支持的手势的标准(criteria).  支持包/类本课程中的示例使用了GestureDetectorCompat 和MotionEventCompa">
+    
+
+    
+        <link rel="alternate" href="/" title="Alin Blog" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Alin Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Entradas',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categorias',
+            TAGS: 'Etiquetas',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.png" />
+            <h2 id="name">阿霖</h2>
+            <h3 id="title">产品经理&amp;程序员</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Hangzhou, China</span>
+            <a id="follow" target="_blank" href="https://weibo.com/nvolume">SEGUIR</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                27
+                <span>Entradas</span>
+            </div>
+            <div class="article-info-block">
+                1
+                <span>Etiqueta</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/linkyan" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-2013-05-10-Detecting-Common-Gestures" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            检测常见的手势 （译文）
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2013/05/10/2013-05-10-Detecting-Common-Gestures/">
+            <time datetime="2013-05-09T16:00:00.000Z" itemprop="datePublished">2013-05-10</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+                        
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>一个触摸手势发生在一个用户将一个或多个手指放在触摸屏上，然后你的应用将这些触摸事件(pattern)翻译为一个具体的手势。有两个相应的阶段去作手势检测:</p>
+<ul>
+<li>收集关于触摸事件的数据.</li>
+<li>解释(interperting)这些数据，看它是否符合你的应用程序所支持的手势的标准(criteria).</li>
+</ul>
+<h3 id="支持包-类"><a href="#支持包-类" class="headerlink" title="支持包/类"></a>支持包/类</h3><p>本课程中的示例使用了GestureDetectorCompat 和MotionEventCompat 类.这些类在支持包中.当可能需要在Android 1.6或者更高的系统中使用时，你应该使用支持包。注意，MotionEventCompat <em>不是</em> MotionEvent类的替代版。相反，它提供了多种静态方法 ，为了接收已经结合事件的期望动作，传递你的MotionEvent对象。</p>
+<h3 id="收集数据"><a href="#收集数据" class="headerlink" title="收集数据"></a>收集数据</h3><p>当用户将一个或多个手指放在屏幕上，在可接收触摸事件的视图上触发回调函数 onTouchEvent().对于每个触摸事件序列(位置，压力，大小，另一个手指的添加等),最终确定为一个手势，onTouchEvent()会多次调用(fired)</p>
+<p>当用户第一次接触屏幕时，手势开始，系统追踪用户手指的位置，手势也跟着继续，直到捕获用户的手指离开屏幕时结束。始终相互作用，传递(delivered)到onTouchEvent()的MotionEvent提供了每个交互的细节。你的应用可以使用这些提供了MotionEvent的数据去决定是否一个手势动作发生了值得去关注。</p>
+<h3 id="在Activity或者View中捕获触摸事件"><a href="#在Activity或者View中捕获触摸事件" class="headerlink" title="在Activity或者View中捕获触摸事件"></a>在Activity或者View中捕获触摸事件</h3><p>重载onTouchEvent()回调函数，以拦截触摸事件在Activity或者View</p>
+<p>以下片段使用了getActionMasked()去提取用户从eventParameter执行的动作。它提供给你原始数据，由你决定是否一个手势是你关心发生的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">public class MainActivity extends Activity &#123;</span><br><span class="line">// This example shows an Activity, but you would use the same approach if</span><br><span class="line">// you were subclassing a View.</span><br><span class="line">@Override</span><br><span class="line">public boolean onTouchEvent(MotionEvent event)&#123;</span><br><span class="line">    int action = MotionEventCompat.getActionMasked(event);</span><br><span class="line">    switch(action) &#123;</span><br><span class="line">        case (MotionEvent.ACTION_DOWN) :</span><br><span class="line">            Log.d(DEBUG_TAG,&quot;Action was DOWN&quot;);</span><br><span class="line">            return true;</span><br><span class="line">        case (MotionEvent.ACTION_MOVE) :</span><br><span class="line">            Log.d(DEBUG_TAG,&quot;Action was MOVE&quot;);</span><br><span class="line">            return true;</span><br><span class="line">        case (MotionEvent.ACTION_UP) :</span><br><span class="line">            Log.d(DEBUG_TAG,&quot;Action was UP&quot;);</span><br><span class="line">            return true;</span><br><span class="line">        case (MotionEvent.ACTION_CANCEL) :</span><br><span class="line">            Log.d(DEBUG_TAG,&quot;Action was CANCEL&quot;);</span><br><span class="line">            return true;</span><br><span class="line">        case (MotionEvent.ACTION_OUTSIDE) :</span><br><span class="line">            Log.d(DEBUG_TAG,&quot;Movement occurred outside bounds &quot; +</span><br><span class="line">                    &quot;of current screen element&quot;);</span><br><span class="line">            return true;      </span><br><span class="line">        default :</span><br><span class="line">            return super.onTouchEvent(event);</span><br><span class="line">    &#125;      </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>然后你可以做你自己的处理在这些事件上，去决定一个手势是否发生。当你需要做一个定制的手势时，这是必须要做的过程。然而，如果你的应用使用常用的手势如双击，长按，扫等等，你可以使用GestureDetector类的优势。GestureDetector将事情简化，它不需要你自己处理个别的触摸时间就可以检测常见的手势.见讨论<a href="http://developer.android.com/training/gestures/detector.html#detect" target="_blank" rel="noopener">Detect Gestures</a></p>
+<p>###在单个View中捕获触摸事件###</p>
+<p>作为OnTouchEvent()的代替，你可以使用setOnTouchListener()方法将一个View.OnTouchListener依附(attach)到任何View对象上去。它使得我们无需子类化一个已经存在的View，而可以去监听触摸事件。例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">View myView = findViewById(R.id.my_view);</span><br><span class="line">myView.setOnTouchListener(new OnTouchListener() &#123;</span><br><span class="line">    public boolean onTouch(View v, MotionEvent event) &#123;</span><br><span class="line">        // ... Respond to touch events      </span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+<p>如果你创建了一个监听器，在处理ACTION_DOWN事件后返回 false ，你需要注意了。如果你这么做了，这个监听器将接收不到随后的ACTION_MOVE和ACTION_UP 事件（String of events)。这是因为ACTION_DOWN是所有触摸事件的触发点。</p>
+<p>如果你创建了一个定制View，你可以重载onTouchEvent()，如以上讨论的。</p>
+<p>###检测手势###</p>
+<p>Android提供了GestureDetector类来检测通用手势，它支持了一些手势在onDown(),onLongPress(),onFling()等方法中。你可以结合OnTouchEvent()使用GestureDetector，如刚才讨论的。</p>
+<p>###检测所有支持的手势###</p>
+<p>当你实例化一个GestureDetectorCompat对象时，其中一个参数需要实现GestureDetector.OnGestureListener接口。GestureDetector.OnGestureListener通知用户何时一个特定的触摸事件发生。为了使你的GestureDetector对象可以接收事件，你需要重载View或者Activity的OnTouchEvent()方法，然后沿着所有被观察的事件传递到检测实例。</p>
+<p>接下来的片段中，一个返回true的特定on&lt;TouchEvent&gt;意味着你已经处理了触摸时间。返回false则通过视图栈向下传递事件，直到触摸被成功处理。</p>
+<p>执行下面的代码，感受下当你与屏幕互动(interact)时，动作是如何被触发的，以及每个触摸事件中MotionEvent的内容。你将会了解即使是单个交互动作有多少数据生产。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br></pre></td><td class="code"><pre><span class="line">public class MainActivity extends Activity implements</span><br><span class="line">        GestureDetector.OnGestureListener,</span><br><span class="line">        GestureDetector.OnDoubleTapListener&#123;</span><br><span class="line">    private static final String DEBUG_TAG = &quot;Gestures&quot;;</span><br><span class="line">    private GestureDetectorCompat mDetector;</span><br><span class="line">    // Called when the activity is first created.</span><br><span class="line">    @Override</span><br><span class="line">    public void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">        super.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line">        // Instantiate the gesture detector with the</span><br><span class="line">        // application context and an implementation of</span><br><span class="line">        // GestureDetector.OnGestureListener</span><br><span class="line">        mDetector = new GestureDetectorCompat(this,this);</span><br><span class="line">        // Set the gesture detector as the double tap</span><br><span class="line">        // listener.</span><br><span class="line">        mDetector.setOnDoubleTapListener(this);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onTouchEvent(MotionEvent event)&#123;</span><br><span class="line">        this.mDetector.onTouchEvent(event);</span><br><span class="line">        // Be sure to call the superclass implementation</span><br><span class="line">        return super.onTouchEvent(event);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onDown(MotionEvent event) &#123;</span><br><span class="line">        Log.d(DEBUG_TAG,&quot;onDown: &quot; + event.toString());</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onFling(MotionEvent event1, MotionEvent event2,</span><br><span class="line">            float velocityX, float velocityY) &#123;</span><br><span class="line">        Log.d(DEBUG_TAG, &quot;onFling: &quot; + event1.toString()+event2.toString());</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void onLongPress(MotionEvent event) &#123;</span><br><span class="line">        Log.d(DEBUG_TAG, &quot;onLongPress: &quot; + event.toString());</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX,</span><br><span class="line">            float distanceY) &#123;</span><br><span class="line">        Log.d(DEBUG_TAG, &quot;onScroll: &quot; + e1.toString()+e2.toString());</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void onShowPress(MotionEvent event) &#123;</span><br><span class="line">        Log.d(DEBUG_TAG, &quot;onShowPress: &quot; + event.toString());</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onSingleTapUp(MotionEvent event) &#123;</span><br><span class="line">        Log.d(DEBUG_TAG, &quot;onSingleTapUp: &quot; + event.toString());</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onDoubleTap(MotionEvent event) &#123;</span><br><span class="line">        Log.d(DEBUG_TAG, &quot;onDoubleTap: &quot; + event.toString());</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onDoubleTapEvent(MotionEvent event) &#123;</span><br><span class="line">        Log.d(DEBUG_TAG, &quot;onDoubleTapEvent: &quot; + event.toString());</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onSingleTapConfirmed(MotionEvent event) &#123;</span><br><span class="line">        Log.d(DEBUG_TAG, &quot;onSingleTapConfirmed: &quot; + event.toString());</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="检测一个被支持手势的子集"><a href="#检测一个被支持手势的子集" class="headerlink" title="检测一个被支持手势的子集"></a>检测一个被支持手势的子集</h3><p>如果你只是想要处理小部分的手势，你可以继承GestureDetector.SimpleOnGestureListener ，而不是GestureDetector.OnGestureListener接口。</p>
+<p>GestureDetector.SimpleOnGestureListener 提供所有On&lt;TouchEvent&gt;方法返回false的实现.因此你可以只重载你所关心的方法。例如，接下来的片段创建了一个继承GestureDetector.SimpleOnGestureListener类，重载了OnFling()和OnDown();</p>
+<p>无论你是否使用GestureDetector.OnGestureListener，这是一个最佳实践(best practice)去实现一个返回true的 onDown()方法。因为所有的手势开始与一个onDown()信息。如果你在onDown()返回false，GestureDetector.SimpleOnGestureListener只做默认动作，系统假定你要忽视手势的剩余部分(rest)，然后GestureDetector.OnGestureListener的其他方法将永远不会被调用。这可能是在你应用中的一个潜在异常(potential)。除非你真的是要忽略手势，你才应该返回false.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public class MainActivity extends Activity &#123;</span><br><span class="line">    private GestureDetectorCompat mDetector;</span><br><span class="line">    @Override</span><br><span class="line">    public void onCreate(Bundle savedInstanceState) &#123;</span><br><span class="line">        super.onCreate(savedInstanceState);</span><br><span class="line">        setContentView(R.layout.activity_main);</span><br><span class="line">        mDetector = new GestureDetectorCompat(this, new MyGestureListener());</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onTouchEvent(MotionEvent event)&#123;</span><br><span class="line">        this.mDetector.onTouchEvent(event);</span><br><span class="line">        return super.onTouchEvent(event);</span><br><span class="line">    &#125;</span><br><span class="line">    class MyGestureListener extends GestureDetector.SimpleOnGestureListener &#123;</span><br><span class="line">        private static final String DEBUG_TAG = &quot;Gestures&quot;;</span><br><span class="line">        @Override</span><br><span class="line">        public boolean onDown(MotionEvent event) &#123;</span><br><span class="line">            Log.d(DEBUG_TAG,&quot;onDown: &quot; + event.toString());</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">        @Override</span><br><span class="line">        public boolean onFling(MotionEvent event1, MotionEvent event2,</span><br><span class="line">                float velocityX, float velocityY) &#123;</span><br><span class="line">            Log.d(DEBUG_TAG, &quot;onFling: &quot; + event1.toString()+event2.toString());</span><br><span class="line">            return true;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2013/05/10/2013-05-10-Detecting-Common-Gestures/" data-id="cjdnn3tka0001rpfy1id25rs4" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2013/05/11/2013-05-11-custom-adapterview/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más nuevo</strong>
+            <div class="article-nav-title">
+                
+                    创建属于你自己的3D ListView - Part 1(译)
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2013/05/10/2013-05-10-movement/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más viejo</strong>
+            <div class="article-nav-title">追踪运动 (译文)</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Recientes</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/2017年年终总结/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/2017年年终总结/" class="title">2017年年终总结</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T21:59:27.000Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/hello-world/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/hello-world/" class="title">Hello World</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T20:49:39.472Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/11/28/2013-11-28-picasso/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/11/28/2013-11-28-picasso/" class="title">Android Picasso-强大的图片下载缓存类库</a></p>
+                            <p class="item-date"><time datetime="2013-11-27T16:00:00.000Z" itemprop="datePublished">2013-11-28</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/10/30/2013-10-30-display-gif/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/10/30/2013-10-30-display-gif/" class="title">Android中显示动画的GIF-Movie类解决方案</a></p>
+                            <p class="item-date"><time datetime="2013-10-29T16:00:00.000Z" itemprop="datePublished">2013-10-30</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/08/01/2013-08-01-dynamic_load/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/08/01/2013-08-01-dynamic_load/" class="title">Custom Class Loading in Dalvik (译)</a></p>
+                            <p class="item-date"><time datetime="2013-07-31T16:00:00.000Z" itemprop="datePublished">2013-08-01</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Categorias</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">25</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Archivos</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a><span class="archive-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Etiquetas</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Nube de etiquetas</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/work/" style="font-size: 10px;">work</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">Links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Alin<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

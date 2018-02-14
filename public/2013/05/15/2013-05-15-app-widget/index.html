@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    
+    <title>Android开发者指南之App Widgets (译) | Alin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="App Widgets是一种能嵌入到其他应用程序(如Home screen)的小型应用程序界面，并且能接收定时的更新。这些视图被称为用户界面中的窗口小部件，需要App Widget provider才能发布.能持有其他App Widgets的应用组件叫做App Widget host.下面显示了一张Music App Widget的图。  本文档将描述如何使用App Widget provider">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Android开发者指南之App Widgets (译)">
+<meta property="og:url" content="http://yoursite.com/2013/05/15/2013-05-15-app-widget/index.html">
+<meta property="og:site_name" content="Alin Blog">
+<meta property="og:description" content="App Widgets是一种能嵌入到其他应用程序(如Home screen)的小型应用程序界面，并且能接收定时的更新。这些视图被称为用户界面中的窗口小部件，需要App Widget provider才能发布.能持有其他App Widgets的应用组件叫做App Widget host.下面显示了一张Music App Widget的图。  本文档将描述如何使用App Widget provider">
+<meta property="og:image" content="http://developer.android.com/images/appwidgets/appwidget.png">
+<meta property="og:image" content="http://developer.android.com/images/appwidgets/StackWidget.png">
+<meta property="og:image" content="http://developer.android.com/images/appwidgets/appwidget_collections.png">
+<meta property="og:updated_time" content="2018-02-14T21:36:14.832Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Android开发者指南之App Widgets (译)">
+<meta name="twitter:description" content="App Widgets是一种能嵌入到其他应用程序(如Home screen)的小型应用程序界面，并且能接收定时的更新。这些视图被称为用户界面中的窗口小部件，需要App Widget provider才能发布.能持有其他App Widgets的应用组件叫做App Widget host.下面显示了一张Music App Widget的图。  本文档将描述如何使用App Widget provider">
+<meta name="twitter:image" content="http://developer.android.com/images/appwidgets/appwidget.png">
+    
+
+    
+        <link rel="alternate" href="/" title="Alin Blog" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Alin Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Entradas',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categorias',
+            TAGS: 'Etiquetas',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.png" />
+            <h2 id="name">阿霖</h2>
+            <h3 id="title">产品经理&amp;程序员</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Hangzhou, China</span>
+            <a id="follow" target="_blank" href="https://weibo.com/nvolume">SEGUIR</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                27
+                <span>Entradas</span>
+            </div>
+            <div class="article-info-block">
+                1
+                <span>Etiqueta</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/linkyan" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-2013-05-15-app-widget" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Android开发者指南之App Widgets (译)
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2013/05/15/2013-05-15-app-widget/">
+            <time datetime="2013-05-14T16:00:00.000Z" itemprop="datePublished">2013-05-15</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+                        
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>App Widgets是一种能嵌入到其他应用程序(如Home screen)的小型应用程序界面，并且能接收定时的更新。这些视图被称为用户界面中的窗口小部件，需要App Widget provider才能发布.能持有其他App Widgets的应用组件叫做App Widget host.下面显示了一张Music App Widget的图。</p>
+<p><img src="http://developer.android.com/images/appwidgets/appwidget.png" alt="music app widget"></p>
+<p>本文档将描述如何使用App Widget provider发布一个App Widget。</p>
+<blockquote>
+<p>####Widget Design<br>更多关于如何设计你的app widget,你可以阅读这篇 <a href="http://developer.android.com/design/patterns/widgets.html" target="_blank" rel="noopener">窗口小部件设计指导</a>.</p>
+</blockquote>
+<h2 id="基础"><a href="#基础" class="headerlink" title="##基础"></a>##基础</h2><p>创建一个App Widget ，你需要以下条件:</p>
+<ol>
+<li>AppWidgetProviderInfo 对象。用来描述App Widget的元数据，比如App Widget的布局，更新频率，AppWidgetProvider类。也可以使用xml定义。</li>
+<li>AppWidgetProvider 类实例。定义了一些基本方法，需要你去实现这些接口，是基于广播(broadcast)事件的。通过它，你可以接收到什么时候App Widget被更新了，可使用，不可使用和被删除了等状态。</li>
+<li>界面布局。定义了为App Widget初始化的布局，定义在XML中。</li>
+</ol>
+<p>此外，你可以实现一个App Widget配置Activity。这个可选的Activity的主要作用是，当用户在启动器(launches)中添加了你的App Widget时允许他在创建的时候就修改App Widget的设置。</p>
+<p>以下各节描述了如何设置每个组件</p>
+<h2 id="在Manifest中声明一个App-Widget"><a href="#在Manifest中声明一个App-Widget" class="headerlink" title="##在Manifest中声明一个App Widget"></a>##在Manifest中声明一个App Widget</h2><p>首先，在你应用程序的AndroidManifest.xml文件中声明AppWidgetProvider类，像这样:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;receiver android:name=&quot;ExampleAppWidgetProvider&quot; &gt;</span><br><span class="line">    &lt;intent-filter&gt;</span><br><span class="line">        &lt;action android:name=&quot;android.appwidget.action.APPWIDGET_UPDATE&quot; /&gt;</span><br><span class="line">    &lt;/intent-filter&gt;</span><br><span class="line">    &lt;meta-data android:name=&quot;android.appwidget.provider&quot;</span><br><span class="line">               android:resource=&quot;@xml/example_appwidget_info&quot; /&gt;</span><br><span class="line">&lt;/receiver&gt;</span><br></pre></td></tr></table></figure>
+<p><code>&lt;receiver&gt;</code>元素需要android:name属性，用来指定App Widget所使用的AppWidgetProvider。</p>
+<p><code>&lt;intent-filter&gt;</code>元素必须包含一个带有android:name属性的<code>&lt;action&gt;</code>元素。这个属性指定了AppWidgetProvider接收<code>ACTION_APPWIDGET_UPDATE</code>广播。这是你必须要显示声明的广播。AppWidgetManager会自动发生其他所有的App Widget广播到AppWidgetProvider中，如果有必要的话。</p>
+<p><code>&lt;meta-data&gt;</code>元素指定了AppWidgetProviderInfo的来源并且要求有以下属性：</p>
+<ul>
+<li>android:name-指定元数据名称。使用<code>android.appwidget.provider</code>作为AppWidgetProviderInfo的描述来识别数据</li>
+<li>android:resource-指定AppWidgetProviderInfo的本地来源</li>
+</ul>
+<h2 id="添加AppWidgetProviderInfo-元数据"><a href="#添加AppWidgetProviderInfo-元数据" class="headerlink" title="##添加AppWidgetProviderInfo 元数据"></a>##添加AppWidgetProviderInfo 元数据</h2><p>AppWidgetProviderInfo定义了一个App Widget必要的特性（qualities），例如最小的布局尺寸，初始布局资源，多久更新一次App Widget，创建时调用的配置Activity。可以使用单个<code>&lt;appwidget-provider&gt;</code>元素的XML资源来定义AppWidgetProviderInfo对象，然后保持到项目的<code>res/xml/</code>文件夹下。</p>
+<p>例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&lt;appwidget-provider xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    android:minWidth=&quot;294dp&quot;</span><br><span class="line">    android:minHeight=&quot;72dp&quot;</span><br><span class="line">    android:updatePeriodMillis=&quot;86400000&quot;</span><br><span class="line">    android:previewImage=&quot;@drawable/preview&quot;</span><br><span class="line">    android:initialLayout=&quot;@layout/example_appwidget&quot;</span><br><span class="line">    android:configure=&quot;com.example.android.ExampleAppWidgetConfigure&quot;</span><br><span class="line">    android:resizeMode=&quot;horizontal|vertical&quot;</span><br><span class="line">    android:widgetCategory=&quot;home_screen|keyguard&quot;</span><br><span class="line">    android:initialKeyguardLayout=&quot;@layout/example_keyguard&quot;&gt;</span><br><span class="line">&lt;/appwidget-provider&gt;</span><br></pre></td></tr></table></figure>
+<p>关于<code>&lt;appwidget-provider&gt;</code>属性的一些总结:</p>
+<ul>
+<li><code>miniWidth</code>和<code>minHeight</code></li>
+<li><code>minResizeWidth</code>和<code>minResizeHeight</code></li>
+<li><code>updatePeriodMillis</code></li>
+<li><code>initialLayout</code></li>
+<li><code>configure</code></li>
+<li><code>perviewImage</code></li>
+<li><code>autoAdvanceViewId</code></li>
+<li><code>resizeMode</code></li>
+<li><code>widgetCategory</code></li>
+<li><code>initialKeyguardLayout</code></li>
+</ul>
+<p>关于更多`<appwidget-provider>可以接收的属性的相关信息，可以查看<a href="http://developer.android.com/reference/android/appwidget/AppWidgetProviderInfo.html" target="_blank" rel="noopener">AppWidgetProviderInfo</a>类。</appwidget-provider></p>
+<h2 id="创建App-Widget布局"><a href="#创建App-Widget布局" class="headerlink" title="创建App Widget布局"></a>创建App Widget布局</h2><hr>
+<p>你必须将你的App Widget初始化布局定义在XML中，并且将它保存在项目的<code>res/layout/</code>目录下。你可以使用下面列表列出的视图对象来设计你的App Widget,但是在你设计你的App Widget前，请先阅读并理解<a href="http://developer.android.com/guide/practices/ui_guidelines/widget_design.html" target="_blank" rel="noopener">App Widget Design Guidelines</a>。</p>
+<p>创建一个App Widget布局是很简单的，如果你很了解<a href="http://developer.android.com/guide/topics/ui/declaring-layout.html" target="_blank" rel="noopener">Layouts</a>的话。但是你应该意识到App Widget是基于<a href="http://developer.android.com/reference/android/widget/RemoteViews.html" target="_blank" rel="noopener">RemoteViews</a>的，它不支持所有类型的布局和控件(view widget)。</p>
+<p>一个RemoteViews对象(consequently 一个App Widget)可以支持以下的布局类:</p>
+<ul>
+<li>FrameLayout</li>
+<li>LinearLayout</li>
+<li>RelativeLayout</li>
+<li>GridLayout</li>
+</ul>
+<p>和以下控件类:</p>
+<ul>
+<li>AnalogClock</li>
+<li>Button</li>
+<li>Chronometer</li>
+<li>ImageButton</li>
+<li>ImageView</li>
+<li>ProgressBar</li>
+<li>TextView</li>
+<li>ViewFlipper</li>
+<li>ListView</li>
+<li>GridView</li>
+<li>StackView</li>
+<li>AdapterViewFlipper</li>
+</ul>
+<p>这些类的派生类(Descendants)是不支持的。</p>
+<p>RemoteViews 也支持 ViewStub,一种不可见，不占大小的视图，你可以在运行时延迟<code>inflate</code>布局资源</p>
+<h3 id="为App-Widget添加margins"><a href="#为App-Widget添加margins" class="headerlink" title="为App Widget添加margins"></a>为App Widget添加margins</h3><h2 id="使用AppWidgetProvider类"><a href="#使用AppWidgetProvider类" class="headerlink" title="使用AppWidgetProvider类"></a>使用AppWidgetProvider类</h2><hr>
+<p>###接收App Widget广播意图 (broadcast intents)</p>
+<h2 id="创建一个App-Widget配置Activity"><a href="#创建一个App-Widget配置Activity" class="headerlink" title="创建一个App Widget配置Activity"></a>创建一个App Widget配置Activity</h2><hr>
+<p>###从配置Activity更新App Widget</p>
+<h2 id="设置预览图片"><a href="#设置预览图片" class="headerlink" title="设置预览图片"></a>设置预览图片</h2><hr>
+<h2 id="使App-Widget在锁屏上可用"><a href="#使App-Widget在锁屏上可用" class="headerlink" title="##使App Widget在锁屏上可用"></a>##使App Widget在锁屏上可用</h2><p>###改变大小指导</p>
+<h2 id="使用带有集合的App-Widget"><a href="#使用带有集合的App-Widget" class="headerlink" title="##使用带有集合的App Widget"></a>##使用带有集合的App Widget</h2><p>Android 3.0引进了带有集合的App Widget。这种App Widget使用RemoteViewService去显示那些支持远程数据的集合,例如从content provider。由RemoteViewsService提供的数据展示在App Widget中使用了以下视图类型中的一种,我们称之为”collections views”</p>
+<ul>
+<li>ListView:A view that shows items in a vertically scrolling list. For an example, see the Gmail app widget.</li>
+<li>GridView:A view that shows items in two-dimensional scrolling grid. For an example, see the Bookmarks app widget.</li>
+<li>StackView:A stacked card view (kind of like a rolodex), where the user can flick the front card up/down to see the previous/next card, respectively. Examples include the YouTube and Books app widgets.</li>
+<li>AdapterViewFlipper:An adapter-backed simple ViewAnimator that animates between two or more views. Only one child is shown at a time.</li>
+</ul>
+<p>正如上文所述,这些collections views显示支持远程数据的集合。这意味着他们使用Adpater将接口和数据<br>绑定一起。Adapter绑定将特殊items从一些集合的数据绑定到特殊的视图对象上。因为这些collection views被adapters支持，所以Android框架必须包含额外的体系结构去支持他们在app widget中使用。在app widget的上下文中，adapter被代替为RemoteViewsFactory,仅仅是简单的对Adapter接口进行了薄封装。当请求在集合中一个具体的item，RemoteViewsFactory会为集合创建并返回RemoteViews对象作为Item。为了能在你的app widget中使用collection view，你必须实现RemoteViewService和RemoteViewsFactory。</p>
+<p>RemoteViewsService是一种允许一个远程adapter请求RemoteViews对象的service。<br>RemoteViewsFactory是一种为collections view（如ListView,GridView等）和视图中潜在数据做适配的接口。下面这段模板代码,你可以用实现service和interface，从StackView Widget sample中提取出来的:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class StackWidgetService extends RemoteViewsService &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public RemoteViewsFactory onGetViewFactory(Intent intent) &#123;</span><br><span class="line">        return new StackRemoteViewsFactory(this.getApplicationContext(), intent);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory &#123;</span><br><span class="line">//... include adapter-like methods here. See the StackView Widget sample.</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="例子应用"><a href="#例子应用" class="headerlink" title="例子应用"></a>例子应用</h3><p>本节的代码片段取材至StackView Widget sample:</p>
+<p><img src="http://developer.android.com/images/appwidgets/StackWidget.png" alt="sample"></p>
+<p>例子有十个栈视图组成，从”0!”显示到”9!”。这个例子app widget有以下主要行为：</p>
+<ul>
+<li>用户可以垂直方向甩动在app widget的顶部View，来显示上一个或者下一个view。这是内建在StackView的行为。</li>
+<li>Without any user interaction, the app widget automatically advances through its views in sequence, like a slide show. This is due to the setting android:autoAdvanceViewId=”@id/stack_view” in the res/xml/stackwidgetinfo.xml file. This setting applies to the view ID, which in this case is the view ID of the stack view.</li>
+<li>If the user touches the top view, the app widget displays the Toast message “Touched view n,” where n is the index (position) of the touched view. For more discussion of how this is implemented, see Adding behavior to individual items.</li>
+</ul>
+<h3 id="实现带有集合的App-Widget"><a href="#实现带有集合的App-Widget" class="headerlink" title="实现带有集合的App Widget"></a>实现带有集合的App Widget</h3><p>To implement an App Widget with collections, you follow the same basic steps you would use to implement any app widget. The following sections describe the additional steps you need to perform to implement an App Widget with collections.</p>
+<h3 id="带有集合的App-Widget的清单"><a href="#带有集合的App-Widget的清单" class="headerlink" title="带有集合的App Widget的清单"></a>带有集合的App Widget的清单</h3><p>In addition to the requirements listed in Declaring an App Widget in the Manifest, to make it possible for App Widgets with collections to bind to your RemoteViewsService, you must declare the service in your manifest file with the permission BIND_REMOTEVIEWS. This prevents other applications from freely accessing your app widget’s data. For example, when creating an App Widget that uses RemoteViewsService to populate a collection view, the manifest entry may look like this:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;service android:name=&quot;MyWidgetService&quot;</span><br><span class="line">...</span><br><span class="line">android:permission=&quot;android.permission.BIND_REMOTEVIEWS&quot; /&gt;</span><br></pre></td></tr></table></figure>
+<p>The line <code>android:name=&quot;MyWidgetService&quot;</code> refers to your subclass of RemoteViewsService.</p>
+<h3 id="带有集合的App-Widget的布局"><a href="#带有集合的App-Widget的布局" class="headerlink" title="带有集合的App Widget的布局"></a>带有集合的App Widget的布局</h3><p>The main requirement for your app widget layout XML file is that it include one of the collection views: ListView, GridView, StackView, or AdapterViewFlipper. Here is the widget_layout.xml for the StackView Widget sample:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;</span><br><span class="line">&lt;FrameLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">    android:layout_width=&quot;match_parent&quot;</span><br><span class="line">    android:layout_height=&quot;match_parent&quot;&gt;</span><br><span class="line">    &lt;StackView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">        android:id=&quot;@+id/stack_view&quot;</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;match_parent&quot;</span><br><span class="line">        android:gravity=&quot;center&quot;</span><br><span class="line">        android:loopViews=&quot;true&quot; /&gt;</span><br><span class="line">    &lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;</span><br><span class="line">        android:id=&quot;@+id/empty_view&quot;</span><br><span class="line">        android:layout_width=&quot;match_parent&quot;</span><br><span class="line">        android:layout_height=&quot;match_parent&quot;</span><br><span class="line">        android:gravity=&quot;center&quot;</span><br><span class="line">        android:background=&quot;@drawable/widget_item_background&quot;</span><br><span class="line">        android:textColor=&quot;#ffffff&quot;</span><br><span class="line">        android:textStyle=&quot;bold&quot;</span><br><span class="line">        android:text=&quot;@string/empty_view_text&quot;</span><br><span class="line">        android:textSize=&quot;20sp&quot; /&gt;</span><br><span class="line">&lt;/FrameLayout&gt;</span><br></pre></td></tr></table></figure>
+<p>Note that empty views must be siblings of the collection view for which the empty view represents empty state.</p>
+<p>In addition to the layout file for your entire app widget, you must create another layout file that defines the layout for each item in the collection (for example, a layout for each book in a collection of books). For example, the StackView Widget sample only has one layout file, widget_item.xml, since all items use the same layout. But the WeatherListWidget sample has two layout files: dark_widget_item.xml and light_widget_item.xml.</p>
+<h3 id="带有集合的App-Widget的AppWidgetProvider"><a href="#带有集合的App-Widget的AppWidgetProvider" class="headerlink" title="带有集合的App Widget的AppWidgetProvider"></a>带有集合的App Widget的AppWidgetProvider</h3><p>As with a regular app widget, the bulk of your code in your AppWidgetProvider subclass typically goes in onUpdate(). The major difference in your implementation for onUpdate() when creating an app widget with collections is that you must call setRemoteAdapter(). This tells the collection view where to get its data. The RemoteViewsService can then return your implementation of RemoteViewsFactory, and the widget can serve up the appropriate data. When you call this method, you must pass an intent that points to your implementation of RemoteViewsService and the App Widget ID that specifies the app widget to update.</p>
+<p>For example, here’s how the StackView Widget sample implements the onUpdate() callback method to set the RemoteViewsService as the remote adapter for the app widget collection:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public void onUpdate(Context context, AppWidgetManager appWidgetManager,</span><br><span class="line">int[] appWidgetIds) &#123;</span><br><span class="line">    // update each of the app widgets with the remote adapter</span><br><span class="line">    for (int i = 0; i &lt; appWidgetIds.length; ++i) &#123;     </span><br><span class="line">        // Set up the intent that starts the StackViewService, which will</span><br><span class="line">        // provide the views for this collection.</span><br><span class="line">        Intent intent = new Intent(context, StackWidgetService.class);</span><br><span class="line">        // Add the app widget ID to the intent extras.</span><br><span class="line">        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);</span><br><span class="line">        intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));</span><br><span class="line">        // Instantiate the RemoteViews object for the App Widget layout.</span><br><span class="line">        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_layout);</span><br><span class="line">        // Set up the RemoteViews object to use a RemoteViews adapter.</span><br><span class="line">        // This adapter connects</span><br><span class="line">        // to a RemoteViewsService  through the specified intent.</span><br><span class="line">        // This is how you populate the data.</span><br><span class="line">        rv.setRemoteAdapter(appWidgetIds[i], R.id.stack_view, intent);       </span><br><span class="line">        // The empty view is displayed when the collection has no items.</span><br><span class="line">        // It should be in the same layout used to instantiate the RemoteViews</span><br><span class="line">        // object above.</span><br><span class="line">        rv.setEmptyView(R.id.stack_view, R.id.empty_view);</span><br><span class="line">        //</span><br><span class="line">        // Do additional processing specific to this app widget...</span><br><span class="line">        //     </span><br><span class="line">        appWidgetManager.updateAppWidget(appWidgetIds[i], rv);   </span><br><span class="line">    &#125;</span><br><span class="line">    super.onUpdate(context, appWidgetManager, appWidgetIds);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="RemoteViewsService类"><a href="#RemoteViewsService类" class="headerlink" title="RemoteViewsService类"></a>RemoteViewsService类</h3><p>As described above, your RemoteViewsService subclass provides the RemoteViewsFactory used to populate the remote collection view.</p>
+<p>Specifically, you need to perform these steps:</p>
+<ol>
+<li>Subclass RemoteViewsService. RemoteViewsService is the service through which a remote adapter can request RemoteViews.</li>
+<li>In your RemoteViewsService subclass, include a class that implements the RemoteViewsFactory interface. RemoteViewsFactory is an interface for an adapter between a remote collection view (such as ListView, GridView, and so on) and the underlying data for that view. Your implementation is responsible for making a RemoteViews object for each item in the data set. This interface is a thin wrapper around Adapter.</li>
+</ol>
+<p>The primary contents of the RemoteViewsService implementation is its RemoteViewsFactory, described below.</p>
+<h3 id="RemoteViewsFactory接口"><a href="#RemoteViewsFactory接口" class="headerlink" title="RemoteViewsFactory接口"></a>RemoteViewsFactory接口</h3><p>Your custom class that implements the RemoteViewsFactory interface provides the app widget with the data for the items in its collection. To do this, it combines your app widget item XML layout file with a source of data. This source of data could be anything from a database to a simple array. In the StackView Widget sample, the data source is an array of WidgetItems. The RemoteViewsFactory functions as an adapter to glue the data to the remote collection view.</p>
+<p>The two most important methods you need to implement for your RemoteViewsFactory subclass are onCreate() and getViewAt() .</p>
+<p>The system calls onCreate() when creating your factory for the first time. This is where you set up any connections and/or cursors to your data source. For example, the StackView Widget sample uses onCreate() to initialize an array of WidgetItem objects. When your app widget is active, the system accesses these objects using their index position in the array and the text they contain is displayed</p>
+<p>Here is an excerpt from the StackView Widget sample’s RemoteViewsFactory implementation that shows portions of the onCreate() method:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class StackRemoteViewsFactory implements</span><br><span class="line">RemoteViewsService.RemoteViewsFactory &#123;</span><br><span class="line">    private static final int mCount = 10;</span><br><span class="line">    private List&lt;WidgetItem&gt; mWidgetItems = new ArrayList&lt;WidgetItem&gt;();</span><br><span class="line">    private Context mContext;</span><br><span class="line">    private int mAppWidgetId;</span><br><span class="line">    public StackRemoteViewsFactory(Context context, Intent intent) &#123;</span><br><span class="line">        mContext = context;</span><br><span class="line">        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,</span><br><span class="line">                AppWidgetManager.INVALID_APPWIDGET_ID);</span><br><span class="line">    &#125;</span><br><span class="line">    public void onCreate() &#123;</span><br><span class="line">        // In onCreate() you setup any connections / cursors to your data source. Heavy lifting,</span><br><span class="line">        // for example downloading or creating content etc, should be deferred to onDataSetChanged()</span><br><span class="line">        // or getViewAt(). Taking more than 20 seconds in this call will result in an ANR.</span><br><span class="line">        for (int i = 0; i &lt; mCount; i++) &#123;</span><br><span class="line">            mWidgetItems.add(new WidgetItem(i + &quot;!&quot;));</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br><span class="line">...</span><br></pre></td></tr></table></figure>
+<p>The RemoteViewsFactory method getViewAt() returns a RemoteViews object corresponding to the data at the specified position in the data set. Here is an excerpt from the StackView Widget sample’s RemoteViewsFactory implementation:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public RemoteViews getViewAt(int position) &#123;</span><br><span class="line">    // Construct a remote views item based on the app widget item XML file,</span><br><span class="line">    // and set the text based on the position.</span><br><span class="line">    RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);</span><br><span class="line">    rv.setTextViewText(R.id.widget_item, mWidgetItems.get(position).text);</span><br><span class="line">    ...</span><br><span class="line">    // Return the remote views object.</span><br><span class="line">    return rv;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="为个别Item添加行为"><a href="#为个别Item添加行为" class="headerlink" title="为个别Item添加行为"></a>为个别Item添加行为</h3><p>The above sections show you how to bind your data to your app widget collection. But what if you want to add dynamic behavior to the individual items in your collection view?</p>
+<p>As described in Using the AppWidgetProvider Class, you normally use setOnClickPendingIntent() to set an object’s click behavior—such as to cause a button to launch an Activity. But this approach is not allowed for child views in an individual collection item (to clarify, you could use setOnClickPendingIntent() to set up a global button in the Gmail app widget that launches the app, for example, but not on the individual list items). Instead, to add click behavior to individual items in a collection, you use setOnClickFillInIntent(). This entails setting up up a pending intent template for your collection view, and then setting a fill-in intent on each item in the collection via your RemoteViewsFactory.</p>
+<p>This section uses the StackView Widget sample to describe how to add behavior to individual items. In the StackView Widget sample, if the user touches the top view, the app widget displays the Toast message “Touched view n,” where n is the index (position) of the touched view. This is how it works:</p>
+<ul>
+<li>The StackWidgetProvider (an AppWidgetProvider subclass) creates a pending intent that has a custom action called TOAST_ACTION.</li>
+<li>When the user touches a view, the intent is fired and it broadcasts TOAST_ACTION.</li>
+<li>This broadcast is intercepted by the StackWidgetProvider’s onReceive() method, and the app widget displays the Toast message for the touched view. The data for the collection items is provided by the RemoteViewsFactory, via the RemoteViewsService.</li>
+</ul>
+<blockquote>
+<p>Note: The StackView Widget sample uses a broadcast, but typically an app widget would simply launch an activity in a scenario like this one.</p>
+</blockquote>
+<h4 id="设置待定意图模板-pending-intent-template"><a href="#设置待定意图模板-pending-intent-template" class="headerlink" title="设置待定意图模板(pending intent template)"></a>设置待定意图模板(pending intent template)</h4><p>StackWidgetProvider（AppWidgetProvider子类）设置了一个待定意图.集合中具体的Item不能单独设置属于他们自己的待定意图。(注：性能原因) 取而代之的，集合作为一个整体设置一个待定意图模板，然后具体的Item设置填充意图(fill-in intent)来创建在item-by-item<br>The StackWidgetProvider (AppWidgetProvider subclass) sets up a pending intent. Individuals items of a collection cannot set up their own pending intents. Instead, the collection as a whole sets up a pending intent template, and the individual items set a fill-in intent to create unique behavior on an item-by-item basis.</p>
+<p>This class also receives the broadcast that is sent when the user touches a view. It processes this event in its onReceive() method. If the intent’s action is TOAST_ACTION, the app widget displays a Toast message for the current view.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br></pre></td><td class="code"><pre><span class="line">public class StackWidgetProvider extends AppWidgetProvider &#123;</span><br><span class="line">    public static final String TOAST_ACTION = &quot;com.example.android.stackwidget.TOAST_ACTION&quot;;</span><br><span class="line">    public static final String EXTRA_ITEM = &quot;com.example.android.stackwidget.EXTRA_ITEM&quot;;</span><br><span class="line">    ...</span><br><span class="line">    // Called when the BroadcastReceiver receives an Intent broadcast.</span><br><span class="line">    // Checks to see whether the intent&apos;s action is TOAST_ACTION. If it is, the app widget</span><br><span class="line">    // displays a Toast message for the current item.</span><br><span class="line">    @Override</span><br><span class="line">    public void onReceive(Context context, Intent intent) &#123;</span><br><span class="line">        AppWidgetManager mgr = AppWidgetManager.getInstance(context);</span><br><span class="line">        if (intent.getAction().equals(TOAST_ACTION)) &#123;</span><br><span class="line">            int appWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,</span><br><span class="line">                AppWidgetManager.INVALID_APPWIDGET_ID);</span><br><span class="line">            int viewIndex = intent.getIntExtra(EXTRA_ITEM, 0);</span><br><span class="line">            Toast.makeText(context, &quot;Touched view &quot; + viewIndex, Toast.LENGTH_SHORT).show();</span><br><span class="line">        &#125;</span><br><span class="line">        super.onReceive(context, intent);</span><br><span class="line">    &#125;</span><br><span class="line">    @Override</span><br><span class="line">    public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) &#123;</span><br><span class="line">        // update each of the app widgets with the remote adapter</span><br><span class="line">        for (int i = 0; i &lt; appWidgetIds.length; ++i) &#123;</span><br><span class="line">            // Sets up the intent that points to the StackViewService that will</span><br><span class="line">            // provide the views for this collection.</span><br><span class="line">            Intent intent = new Intent(context, StackWidgetService.class);</span><br><span class="line">            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);</span><br><span class="line">            // When intents are compared, the extras are ignored, so we need to embed the extras</span><br><span class="line">            // into the data so that the extras will not be ignored.</span><br><span class="line">            intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));</span><br><span class="line">            RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget_layout);</span><br><span class="line">            rv.setRemoteAdapter(appWidgetIds[i], R.id.stack_view, intent);</span><br><span class="line">            // The empty view is displayed when the collection has no items. It should be a sibling</span><br><span class="line">            // of the collection view.</span><br><span class="line">            rv.setEmptyView(R.id.stack_view, R.id.empty_view);</span><br><span class="line">            // This section makes it possible for items to have individualized behavior.</span><br><span class="line">            // It does this by setting up a pending intent template. Individuals items of a collection</span><br><span class="line">            // cannot set up their own pending intents. Instead, the collection as a whole sets</span><br><span class="line">            // up a pending intent template, and the individual items set a fillInIntent</span><br><span class="line">            // to create unique behavior on an item-by-item basis.</span><br><span class="line">            Intent toastIntent = new Intent(context, StackWidgetProvider.class);</span><br><span class="line">            // Set the action for the intent.</span><br><span class="line">            // When the user touches a particular view, it will have the effect of</span><br><span class="line">            // broadcasting TOAST_ACTION.</span><br><span class="line">            toastIntent.setAction(StackWidgetProvider.TOAST_ACTION);</span><br><span class="line">            toastIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetIds[i]);</span><br><span class="line">            intent.setData(Uri.parse(intent.toUri(Intent.URI_INTENT_SCHEME)));</span><br><span class="line">            PendingIntent toastPendingIntent = PendingIntent.getBroadcast(context, 0, toastIntent,</span><br><span class="line">                PendingIntent.FLAG_UPDATE_CURRENT);</span><br><span class="line">            rv.setPendingIntentTemplate(R.id.stack_view, toastPendingIntent);</span><br><span class="line">            appWidgetManager.updateAppWidget(appWidgetIds[i], rv);</span><br><span class="line">        &#125;</span><br><span class="line">    super.onUpdate(context, appWidgetManager, appWidgetIds);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="设置填充意图-fill-in-intent"><a href="#设置填充意图-fill-in-intent" class="headerlink" title="设置填充意图(fill-in intent)"></a>设置填充意图(fill-in intent)</h4><p>你的RemoteViewsFactory必须为每一个在集合中的item设置一个填充意图(fill-in intent)。这样才可能做到区分给定的Item单独的点击动作。填充意图然后与待定意图模板(PendingItent template)结合一起，确定了当item被点击时将执行的最终意图。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br></pre></td><td class="code"><pre><span class="line">public class StackWidgetService extends RemoteViewsService &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public RemoteViewsFactory onGetViewFactory(Intent intent) &#123;</span><br><span class="line">        return new StackRemoteViewsFactory(this.getApplicationContext(), intent);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">class StackRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory &#123;</span><br><span class="line">    private static final int mCount = 10;</span><br><span class="line">    private List&lt;WidgetItem&gt; mWidgetItems = new ArrayList&lt;WidgetItem&gt;();</span><br><span class="line">    private Context mContext;</span><br><span class="line">    private int mAppWidgetId;</span><br><span class="line">    public StackRemoteViewsFactory(Context context, Intent intent) &#123;</span><br><span class="line">        mContext = context;</span><br><span class="line">        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,</span><br><span class="line">                AppWidgetManager.INVALID_APPWIDGET_ID);</span><br><span class="line">    &#125;</span><br><span class="line">    // 初始化数据</span><br><span class="line">        public void onCreate() &#123;</span><br><span class="line">            // 在 onCreate()你可以建立任何连接/游标 到你的源数据中.Heavy lifting.</span><br><span class="line">            // 如下载或者创建内容等，应该延迟到onDataSetChanged()方法中</span><br><span class="line">            // 或者 getViewAt(), 在这个回调中耗时超过20秒，将会引起ANR.</span><br><span class="line">            for (int i = 0; i &lt; mCount; i++) &#123;</span><br><span class="line">                mWidgetItems.add(new WidgetItem(i + &quot;!&quot;));</span><br><span class="line">            &#125;</span><br><span class="line">           ...</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">        // Given the position (index) of a WidgetItem in the array, use the item&apos;s text value in</span><br><span class="line">        // combination with the app widget item XML file to construct a RemoteViews object.</span><br><span class="line">        public RemoteViews getViewAt(int position) &#123;</span><br><span class="line">            // position will always range from 0 to getCount() - 1.</span><br><span class="line">            // Construct a RemoteViews item based on the app widget item XML file, and set the</span><br><span class="line">            // text based on the position.</span><br><span class="line">            RemoteViews rv = new RemoteViews(mContext.getPackageName(), R.layout.widget_item);</span><br><span class="line">            rv.setTextViewText(R.id.widget_item, mWidgetItems.get(position).text);</span><br><span class="line">            // Next, set a fill-intent, which will be used to fill in the pending intent template</span><br><span class="line">            // that is set on the collection view in StackWidgetProvider.</span><br><span class="line">            Bundle extras = new Bundle();</span><br><span class="line">            extras.putInt(StackWidgetProvider.EXTRA_ITEM, position);</span><br><span class="line">            Intent fillInIntent = new Intent();</span><br><span class="line">            fillInIntent.putExtras(extras);</span><br><span class="line">            // Make it possible to distinguish the individual on-click</span><br><span class="line">            // action of a given item</span><br><span class="line">            rv.setOnClickFillInIntent(R.id.widget_item, fillInIntent);</span><br><span class="line">            ...</span><br><span class="line">            // Return the RemoteViews object.</span><br><span class="line">            return rv;</span><br><span class="line">        &#125;</span><br><span class="line">    ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<h2 id="保持集合数据最新"><a href="#保持集合数据最新" class="headerlink" title="保持集合数据最新"></a>保持集合数据最新</h2><p>下面的流程图发生在一个使用了集合的App Widget更新数据时。它展示了App Widget代码与RemoteViewsFactory的交互，以及你如何触发更新。</p>
+<p><img src="http://developer.android.com/images/appwidgets/appwidget_collections.png" alt="fresh data"></p>
+<p>使用了集合的App Widgets的其中一个特性就是可以为用户提供最新的内容。例如，Android 3.0 Gmail app widget，可以为用户提供他们收件箱的一个快照。为了做到这一点，你需要能触发你的RemoteViewsFactory和集合view,去获得并且显示新数据。你可以通过使用AppWidgetManager调用notifyAppWidgetViewDataChanged()来实现这一点。然后在你的RemoteViewsFactory的OnDataChanged()获得一个回调结果，一个你有机会可以获取任何新数据的回调接口。注意，你可以在onDataSetChanged()回调方法中执行密集的同步操作(processing-intensive operations synchronously)。回调方法在元数据或者视图数据从RemoteViewsFactory那里获取之前以及被执行完成，所以你可以放心。此外，你也可以在getViewAt()方法内执行密集的同步操作。<strong>如果这个回调函数执行了很长时间，那么加载视图(RemoteViewsFactory中指定的getLoadingView()方法)将被显示在集合视图中正确的位置，直到它返回结果.</strong></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2013/05/15/2013-05-15-app-widget/" data-id="cjdnn3tlh000lrpfyfglz1auu" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2013/05/17/2013-05-17-about-activeandroid/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más nuevo</strong>
+            <div class="article-nav-title">
+                
+                    ActiveAndroid--Android轻量级ORM框架
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2013/05/14/2013-05-14-countdownlatch/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más viejo</strong>
+            <div class="article-nav-title">Java并发之CountDownLatch</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Recientes</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/2017年年终总结/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/2017年年终总结/" class="title">2017年年终总结</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T21:59:27.000Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/hello-world/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/hello-world/" class="title">Hello World</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T20:49:39.472Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/11/28/2013-11-28-picasso/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/11/28/2013-11-28-picasso/" class="title">Android Picasso-强大的图片下载缓存类库</a></p>
+                            <p class="item-date"><time datetime="2013-11-27T16:00:00.000Z" itemprop="datePublished">2013-11-28</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/10/30/2013-10-30-display-gif/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/10/30/2013-10-30-display-gif/" class="title">Android中显示动画的GIF-Movie类解决方案</a></p>
+                            <p class="item-date"><time datetime="2013-10-29T16:00:00.000Z" itemprop="datePublished">2013-10-30</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/08/01/2013-08-01-dynamic_load/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/08/01/2013-08-01-dynamic_load/" class="title">Custom Class Loading in Dalvik (译)</a></p>
+                            <p class="item-date"><time datetime="2013-07-31T16:00:00.000Z" itemprop="datePublished">2013-08-01</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Categorias</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">25</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Archivos</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a><span class="archive-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Etiquetas</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Nube de etiquetas</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/work/" style="font-size: 10px;">work</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">Links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Alin<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

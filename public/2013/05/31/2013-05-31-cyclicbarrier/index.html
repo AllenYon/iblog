@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    
+    <title>Java并发之CyclicBarrier | Alin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="书摘： CyclicBarrier适用于这样的情况：你希望创建一组任务,他们并行地执行工作，然后在进行下一个步骤之前等待，直至所有任务都完成(看起来有些像join())。 它使得所有的并行任务都将在栅栏处列队，因此可以一致地向钱移动。这非常像CountDownLatch,只是CountDownLatch是只触发一次的事件，而CyclicBarrier可以多次重用。 刚开始接触计算机时开始，我就对仿">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Java并发之CyclicBarrier">
+<meta property="og:url" content="http://yoursite.com/2013/05/31/2013-05-31-cyclicbarrier/index.html">
+<meta property="og:site_name" content="Alin Blog">
+<meta property="og:description" content="书摘： CyclicBarrier适用于这样的情况：你希望创建一组任务,他们并行地执行工作，然后在进行下一个步骤之前等待，直至所有任务都完成(看起来有些像join())。 它使得所有的并行任务都将在栅栏处列队，因此可以一致地向钱移动。这非常像CountDownLatch,只是CountDownLatch是只触发一次的事件，而CyclicBarrier可以多次重用。 刚开始接触计算机时开始，我就对仿">
+<meta property="og:updated_time" content="2018-02-14T21:36:14.833Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Java并发之CyclicBarrier">
+<meta name="twitter:description" content="书摘： CyclicBarrier适用于这样的情况：你希望创建一组任务,他们并行地执行工作，然后在进行下一个步骤之前等待，直至所有任务都完成(看起来有些像join())。 它使得所有的并行任务都将在栅栏处列队，因此可以一致地向钱移动。这非常像CountDownLatch,只是CountDownLatch是只触发一次的事件，而CyclicBarrier可以多次重用。 刚开始接触计算机时开始，我就对仿">
+    
+
+    
+        <link rel="alternate" href="/" title="Alin Blog" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Alin Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Entradas',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categorias',
+            TAGS: 'Etiquetas',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.png" />
+            <h2 id="name">阿霖</h2>
+            <h3 id="title">产品经理&amp;程序员</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Hangzhou, China</span>
+            <a id="follow" target="_blank" href="https://weibo.com/nvolume">SEGUIR</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                27
+                <span>Entradas</span>
+            </div>
+            <div class="article-info-block">
+                1
+                <span>Etiqueta</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/linkyan" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-2013-05-31-cyclicbarrier" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Java并发之CyclicBarrier
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2013/05/31/2013-05-31-cyclicbarrier/">
+            <time datetime="2013-05-30T16:00:00.000Z" itemprop="datePublished">2013-05-31</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+                        
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>书摘：</p>
+<p><code>CyclicBarrier</code>适用于这样的情况：你希望创建一组任务,他们并行地执行工作，然后在进行下一个步骤之前等待，直至所有任务都完成(看起来有些像join())。 它使得所有的并行任务都将在栅栏处列队，因此可以一致地向钱移动。这非常像CountDownLatch,只是CountDownLatch是只触发一次的事件，而CyclicBarrier可以多次重用。</p>
+<p>刚开始接触计算机时开始，我就对仿真着了迷，而并发是使仿真成为可能的一个关键因素。记得我最开始编写的一个程序就是一个仿真：一个用BASIC编写的（由于文件名的限制而命名为HOSRAC.BAS的赛马游戏）。下面是那个程序的面向对象的多线程版本，其中使用了<code>CyclicBarrier</code>：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br></pre></td><td class="code"><pre><span class="line">package cn.link.example;</span><br><span class="line"></span><br><span class="line">import java.util.ArrayList;</span><br><span class="line">import java.util.List;</span><br><span class="line">import java.util.Random;</span><br><span class="line">import java.util.concurrent.*;</span><br><span class="line"></span><br><span class="line">class Horse implements Runnable &#123;</span><br><span class="line">    private static int counter = 0;</span><br><span class="line">    private final int id = counter++;</span><br><span class="line">    private int strides = 0;</span><br><span class="line">    private static Random rand = new Random(47);</span><br><span class="line">    private static CyclicBarrier barrier;</span><br><span class="line"></span><br><span class="line">    public Horse(CyclicBarrier b) &#123;</span><br><span class="line">        barrier = b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public synchronized int getStrides() &#123;</span><br><span class="line">        return strides;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public void run() &#123;</span><br><span class="line">        //ToDo</span><br><span class="line">        while (!Thread.interrupted()) &#123;</span><br><span class="line">            synchronized (this) &#123;</span><br><span class="line">                strides += rand.nextInt(3);</span><br><span class="line">            &#125;</span><br><span class="line">            try &#123;</span><br><span class="line">                barrier.await();</span><br><span class="line">            &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.</span><br><span class="line">            &#125; catch (BrokenBarrierException e) &#123;</span><br><span class="line">                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.</span><br><span class="line">            &#125;</span><br><span class="line"></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    public String toString() &#123;</span><br><span class="line">        return &quot;Horse &quot; + id + &quot; &quot;;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public String tracks() &#123;</span><br><span class="line">        StringBuilder s = new StringBuilder();</span><br><span class="line">        for (int i = 0; i &lt; getStrides(); i++) &#123;</span><br><span class="line">            s.append(&quot;*&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">        s.append(id);</span><br><span class="line">        return s.toString();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class HorseRace &#123;</span><br><span class="line">    static final int FINISH_LINE = 80;</span><br><span class="line">    private List&lt;Horse&gt; horses = new ArrayList&lt;Horse&gt;();</span><br><span class="line">    private ExecutorService exec = Executors.newCachedThreadPool();</span><br><span class="line">    private CyclicBarrier barrier;</span><br><span class="line"></span><br><span class="line">    public HorseRace(int nHorses, final int pause) &#123;</span><br><span class="line">        barrier = new CyclicBarrier(nHorses, new Runnable() &#123;</span><br><span class="line">            @Override</span><br><span class="line">            public void run() &#123;</span><br><span class="line">                //ToDo</span><br><span class="line">                StringBuilder s = new StringBuilder();</span><br><span class="line">                for (int i = 0; i &lt; FINISH_LINE; i++) &#123;</span><br><span class="line">                    s.append(&quot;=&quot;);</span><br><span class="line">                &#125;</span><br><span class="line">                System.out.println(s);</span><br><span class="line">                for (Horse horse : horses) &#123;</span><br><span class="line">                    System.out.println(horse.tracks());</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                for (Horse horse : horses) &#123;</span><br><span class="line">                    if (horse.getStrides() &gt;= FINISH_LINE) &#123;</span><br><span class="line">                        System.out.println(horse + &quot;won!&quot;);</span><br><span class="line">                        exec.shutdownNow();</span><br><span class="line">                        return;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                try &#123;</span><br><span class="line">                    TimeUnit.MILLISECONDS.sleep(pause);</span><br><span class="line">                &#125; catch (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">            &#125;</span><br><span class="line">        &#125;);</span><br><span class="line"></span><br><span class="line">        for (int i = 0; i &lt; nHorses; i++) &#123;</span><br><span class="line">            Horse horse = new Horse(barrier);</span><br><span class="line">            horses.add(horse);</span><br><span class="line">            exec.execute(horse);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        int nHorses = 7;</span><br><span class="line">        int pause = 200;</span><br><span class="line"></span><br><span class="line">//        if (args.length &gt; 0) &#123;</span><br><span class="line">//            int n = new Integer(args[0]);</span><br><span class="line">//            nHorses = n &gt; 0 ? n : nHorses;</span><br><span class="line">//        &#125;</span><br><span class="line">        new HorseRace(nHorses, pause);</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以向CyclicBarrier提供一个“栅栏动作”，他是一个Runnable,当计数值到达0时自动执行–这是CyclicBarrier和CountDownLatch之间的另一个区别。这里，栅栏动作是作为匿名内部类创建的，它被提交给了CyclicBarrier的构造器。</p>
+<p>我试图让每匹马都打印自己，但是之后的显示顺序取决于任务管理器。CyclicBarrier使得每匹马都要执行为了向前移动所必需执行的所有工作，然后必须在栅栏处等待其他所有的马都准备完毕。当所有的马都向前移动时，CyclicBarrier将自动调用Runnable栅栏动作任务，按顺序显示马和终点线的位置。</p>
+<p>一旦所有的任务都越过了栅栏，它就会自动的为下一回合的比赛做好准备。</p>
+<p>为了展示这个非常简单的动画效果，你需要将控制台视窗的尺寸调整为小到只有马时，才会展示出来。</p>
+<p><a href="http://linkyan.com/2013/05/countdownlatch/" target="_blank" rel="noopener">链接:Java并发之CountDownLatch</a></p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2013/05/31/2013-05-31-cyclicbarrier/" data-id="cjdnn3tll000qrpfyczwvp4vt" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2013/06/03/2013-06-03-android-screen/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más nuevo</strong>
+            <div class="article-nav-title">
+                
+                    Android屏幕分辨率占有率分析及应用
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2013/05/31/2013-05-31-exceptioncenter/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más viejo</strong>
+            <div class="article-nav-title">Android框架设计之ExceptionCenter</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Recientes</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/2017年年终总结/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/2017年年终总结/" class="title">2017年年终总结</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T21:59:27.000Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/hello-world/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/hello-world/" class="title">Hello World</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T20:49:39.472Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/11/28/2013-11-28-picasso/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/11/28/2013-11-28-picasso/" class="title">Android Picasso-强大的图片下载缓存类库</a></p>
+                            <p class="item-date"><time datetime="2013-11-27T16:00:00.000Z" itemprop="datePublished">2013-11-28</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/10/30/2013-10-30-display-gif/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/10/30/2013-10-30-display-gif/" class="title">Android中显示动画的GIF-Movie类解决方案</a></p>
+                            <p class="item-date"><time datetime="2013-10-29T16:00:00.000Z" itemprop="datePublished">2013-10-30</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/08/01/2013-08-01-dynamic_load/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/08/01/2013-08-01-dynamic_load/" class="title">Custom Class Loading in Dalvik (译)</a></p>
+                            <p class="item-date"><time datetime="2013-07-31T16:00:00.000Z" itemprop="datePublished">2013-08-01</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Categorias</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">25</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Archivos</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a><span class="archive-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Etiquetas</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Nube de etiquetas</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/work/" style="font-size: 10px;">work</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">Links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Alin<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>

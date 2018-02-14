@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    
+    <title>Google官方指南-动画滚动手势 | Alin Blog</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+    <meta name="description" content="source:http://developer.android.com/training/gestures/scroll.html 在Android中，通常我们使用ScrollView类来实现滑动。任何标准的布局都可能超出容器本身的边界，需要嵌套在由框架管理的可滑动视图的ScrollView中去展示。只有在需要特定的场景中，我们才可能需要去实现一个自定的Scroller。本章节描述了这么一个场景，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Google官方指南-动画滚动手势">
+<meta property="og:url" content="http://yoursite.com/2013/06/19/2013-06-19-animating-scroll-gesture/index.html">
+<meta property="og:site_name" content="Alin Blog">
+<meta property="og:description" content="source:http://developer.android.com/training/gestures/scroll.html 在Android中，通常我们使用ScrollView类来实现滑动。任何标准的布局都可能超出容器本身的边界，需要嵌套在由框架管理的可滑动视图的ScrollView中去展示。只有在需要特定的场景中，我们才可能需要去实现一个自定的Scroller。本章节描述了这么一个场景，">
+<meta property="og:updated_time" content="2018-02-14T21:36:14.837Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Google官方指南-动画滚动手势">
+<meta name="twitter:description" content="source:http://developer.android.com/training/gestures/scroll.html 在Android中，通常我们使用ScrollView类来实现滑动。任何标准的布局都可能超出容器本身的边界，需要嵌套在由框架管理的可滑动视图的ScrollView中去展示。只有在需要特定的场景中，我们才可能需要去实现一个自定的Scroller。本章节描述了这么一个场景，">
+    
+
+    
+        <link rel="alternate" href="/" title="Alin Blog" type="application/atom+xml" />
+    
+
+    
+
+    <link rel="stylesheet" href="/libs/font-awesome/css/font-awesome.min.css">
+    <link rel="stylesheet" href="/libs/open-sans/styles.css">
+    <link rel="stylesheet" href="/libs/source-code-pro/styles.css">
+
+    <link rel="stylesheet" href="/css/style.css">
+
+    <script src="/libs/jquery/2.1.3/jquery.min.js"></script>
+    
+    
+        <link rel="stylesheet" href="/libs/lightgallery/css/lightgallery.min.css">
+    
+    
+        <link rel="stylesheet" href="/libs/justified-gallery/justifiedGallery.min.css">
+    
+    
+    
+    
+
+
+</head>
+
+<body>
+    <div id="container">
+        <header id="header">
+    <div id="header-main" class="header-inner">
+        <div class="outer">
+            <a href="/" id="logo">
+                <i class="logo"></i>
+                <span class="site-title">Alin Blog</span>
+            </a>
+            <nav id="main-nav">
+                
+                    <a class="main-nav-link" href="/.">Home</a>
+                
+                    <a class="main-nav-link" href="/archives">Archives</a>
+                
+                    <a class="main-nav-link" href="/about">About</a>
+                
+            </nav>
+            
+                
+                <nav id="sub-nav">
+                    <div class="profile" id="profile-nav">
+                        <a id="profile-anchor" href="javascript:;">
+                            <img class="avatar" src="/css/images/avatar.png" />
+                            <i class="fa fa-caret-down"></i>
+                        </a>
+                    </div>
+                </nav>
+            
+            <div id="search-form-wrap">
+
+    <form class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+        <button type="submit" class="search-form-submit"></button>
+    </form>
+    <div class="ins-search">
+    <div class="ins-search-mask"></div>
+    <div class="ins-search-container">
+        <div class="ins-input-wrapper">
+            <input type="text" class="ins-search-input" placeholder="Type something..." />
+            <span class="ins-close ins-selectable"><i class="fa fa-times-circle"></i></span>
+        </div>
+        <div class="ins-section-wrapper">
+            <div class="ins-section-container"></div>
+        </div>
+    </div>
+</div>
+<script>
+(function (window) {
+    var INSIGHT_CONFIG = {
+        TRANSLATION: {
+            POSTS: 'Entradas',
+            PAGES: 'Pages',
+            CATEGORIES: 'Categorias',
+            TAGS: 'Etiquetas',
+            UNTITLED: '(Untitled)',
+        },
+        ROOT_URL: '/',
+        CONTENT_URL: '/content.json',
+    };
+    window.INSIGHT_CONFIG = INSIGHT_CONFIG;
+})(window);
+</script>
+<script src="/js/insight.js"></script>
+
+</div>
+        </div>
+    </div>
+    <div id="main-nav-mobile" class="header-sub header-inner">
+        <table class="menu outer">
+            <tr>
+                
+                    <td><a class="main-nav-link" href="/.">Home</a></td>
+                
+                    <td><a class="main-nav-link" href="/archives">Archives</a></td>
+                
+                    <td><a class="main-nav-link" href="/about">About</a></td>
+                
+                <td>
+                    
+    <div class="search-form">
+        <input type="text" class="ins-search-input search-form-input" placeholder="Buscar" />
+    </div>
+
+                </td>
+            </tr>
+        </table>
+    </div>
+</header>
+
+        <div class="outer">
+            
+                
+
+<aside id="profile">
+    <div class="inner profile-inner">
+        <div class="base-info profile-block">
+            <img id="avatar" src="/css/images/avatar.png" />
+            <h2 id="name">阿霖</h2>
+            <h3 id="title">产品经理&amp;程序员</h3>
+            <span id="location"><i class="fa fa-map-marker"></i>Hangzhou, China</span>
+            <a id="follow" target="_blank" href="https://weibo.com/nvolume">SEGUIR</a>
+        </div>
+        <div class="article-info profile-block">
+            <div class="article-info-block">
+                27
+                <span>Entradas</span>
+            </div>
+            <div class="article-info-block">
+                1
+                <span>Etiqueta</span>
+            </div>
+        </div>
+        
+        <div class="profile-block social-links">
+            <table>
+                <tr>
+                    
+                    
+                    <td>
+                        <a href="http://github.com/linkyan" target="_blank" title="github" class=tooltip>
+                            <i class="fa fa-github"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="twitter" class=tooltip>
+                            <i class="fa fa-twitter"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="facebook" class=tooltip>
+                            <i class="fa fa-facebook"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="dribbble" class=tooltip>
+                            <i class="fa fa-dribbble"></i>
+                        </a>
+                    </td>
+                    
+                    <td>
+                        <a href="/" target="_blank" title="rss" class=tooltip>
+                            <i class="fa fa-rss"></i>
+                        </a>
+                    </td>
+                    
+                </tr>
+            </table>
+        </div>
+        
+    </div>
+</aside>
+
+            
+            <section id="main"><article id="post-2013-06-19-animating-scroll-gesture" class="article article-type-post" itemscope itemprop="blogPost">
+    <div class="article-inner">
+        
+        
+            <header class="article-header">
+                
+    
+        <h1 class="article-title" itemprop="name">
+            Google官方指南-动画滚动手势
+        </h1>
+    
+
+                
+                    <div class="article-meta">
+                        
+    <div class="article-date">
+        <i class="fa fa-calendar"></i>
+        <a href="/2013/06/19/2013-06-19-animating-scroll-gesture/">
+            <time datetime="2013-06-18T16:00:00.000Z" itemprop="datePublished">2013-06-19</time>
+        </a>
+    </div>
+
+
+                        
+    <div class="article-category">
+    	<i class="fa fa-folder"></i>
+        <a class="article-category-link" href="/categories/Android/">Android</a>
+    </div>
+
+                        
+                    </div>
+                
+            </header>
+        
+        
+        <div class="article-entry" itemprop="articleBody">
+        
+            
+            <p>source:<a href="http://developer.android.com/training/gestures/scroll.html" target="_blank" rel="noopener">http://developer.android.com/training/gestures/scroll.html</a></p>
+<p>在Android中，通常我们使用ScrollView类来实现滑动。任何标准的布局都可能超出容器本身的边界，需要嵌套在由框架管理的可滑动视图的ScrollView中去展示。只有在需要特定的场景中，我们才可能需要去实现一个自定的Scroller。本章节描述了这么一个场景，显示一个使用了滑动器，响应触摸手势的滑动效果。</p>
+<p>你可以使用Scroller（如 Scroller 或者 OverScroller）去收集生产一个滑动动画所需要响应的触摸事件的数据。它们很类似，但是OverScroller包含指示用户甩动手势已经到达内容边界的方法。InteractiveChart示例使用了EdgeEffect类(准确地说是 EdgeEffectCompat类)去显示发光的效果，当用户到达内容的边界。</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>注意：我们建议你使用OverScroller而不是Scroller去实现滑动动画。OverScroller为旧的设备提供了最好的向后兼容性。</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>同样提醒你通常只有你要自己实现滑动时才使用scrollers。ScrollView和HorizontalScrollView已经为你准备好一切，如果你把布局嵌套其中。</p>
+<p>Scroller被用于随时间推移动画滚动，使用平台标准的滚动物理（摩擦，速度等）。Scroller其实本身不绘制任何东西。Scrollers随时间推移跟踪滚动偏移，但是他们不会自动地将你的视图移动到那些位置。而是应该由你去获取坐标并且按照一定的速率，以使得滚动动画看起来比较平滑。</p>
+<h2 id="理解滚动术语"><a href="#理解滚动术语" class="headerlink" title="##理解滚动术语"></a>##理解滚动术语</h2><p>“Scrolling”在不同的Android中不同的上下文有着不同的含义。</p>
+<ul>
+<li>滚动是移动视图窗口(viewport–也就是你正看到的内容的窗口)的一般过程。当同时在x和y轴滚动式，称为平移(panning)。在样品应用中提供了这样一个类，InteractiveChart,说明了两种类型的滚动,拖拽和甩动。</li>
+<li>拖动是一种滚动–发生在用户将他的手指在触摸屏上拖动。简单的拖动经常是通过重写GestureDetector.OnGestureListener类的onScroll()函数实现的。更多关于拖动的讨论，查看Dragging and Scaling.</li>
+</ul>
+<p>甩是一种滚动发生在用户拖动并快速抬起他的手指。在用户抬起他的手指后，你通常要保持滚动(移动视口),但是减速滚动直到视口停止移动。甩动作可以通过重写GestureDetector.OnGestureListener类的onFling()实现，并且使用一个scroller类。这就是本主题要将的使用情况。</p>
+<p>通常使用scroller对象关联甩手势，但他们可以被用在几乎任何你想要UI去反馈触摸事件显示滚动的上下文中。例如，你可以重写onTouchEvent()直接处理触摸事件，并且产生一个滚动效果或者一个吸附页面（snapping to page）动画响应那些触摸事件</p>
+<h2 id="实现基于触摸的滚动"><a href="#实现基于触摸的滚动" class="headerlink" title="##实现基于触摸的滚动"></a>##实现基于触摸的滚动</h2><p>本段描述了如何使用scroller类，下面展示的片段来自InteractiveChart。它使用了GestureDetector，并且重写GestureDetector.SimpleOnGestureListener中的onFling()。使用了OverScroller跟踪甩手势。如果用户在甩手势之后达到了内容的边界，应用会显示一个发光效果。</p>
+<blockquote>
+<blockquote>
+<blockquote>
+<p>Note: The InteractiveChart sample app displays a chart that you can zoom, pan, scroll, and so on. In the following snippet, mContentRect represents the rectangle coordinates within the view that the chart will be drawn into. At any given time, a subset of the total chart domain and range are drawn into this rectangular area. mCurrentViewport represents the portion of the chart that is currently visible in the screen. Because pixel offsets are generally treated as integers, mContentRect is of the type Rect. Because the graph domain and range are decimal/float values, mCurrentViewport is of the type RectF.</p>
+</blockquote>
+</blockquote>
+</blockquote>
+<p>The first part of the snippet shows the implementation of onFling():</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br></pre></td><td class="code"><pre><span class="line">// The current viewport. This rectangle represents the currently visible</span><br><span class="line">// chart domain and range. The viewport is the part of the app that the</span><br><span class="line">// user manipulates via touch gestures.</span><br><span class="line">private RectF mCurrentViewport =</span><br><span class="line">        new RectF(AXIS_X_MIN, AXIS_Y_MIN, AXIS_X_MAX, AXIS_Y_MAX);</span><br><span class="line"></span><br><span class="line">// The current destination rectangle (in pixel coordinates) into which the</span><br><span class="line">// chart data should be drawn.</span><br><span class="line">private Rect mContentRect;</span><br><span class="line"></span><br><span class="line">private OverScroller mScroller;</span><br><span class="line">private RectF mScrollerStartViewport;</span><br><span class="line">...</span><br><span class="line">private final GestureDetector.SimpleOnGestureListener mGestureListener</span><br><span class="line">        = new GestureDetector.SimpleOnGestureListener() &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onDown(MotionEvent e) &#123;</span><br><span class="line">        // Initiates the decay phase of any active edge effects.</span><br><span class="line">        releaseEdgeEffects();</span><br><span class="line">        mScrollerStartViewport.set(mCurrentViewport);</span><br><span class="line">        // Aborts any active scroll animations and invalidates.</span><br><span class="line">        mScroller.forceFinished(true);</span><br><span class="line">        ViewCompat.postInvalidateOnAnimation(InteractiveLineGraphView.this);</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br><span class="line">    @Override</span><br><span class="line">    public boolean onFling(MotionEvent e1, MotionEvent e2,</span><br><span class="line">            float velocityX, float velocityY) &#123;</span><br><span class="line">        fling((int) -velocityX, (int) -velocityY);</span><br><span class="line">        return true;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;;</span><br><span class="line"></span><br><span class="line">private void fling(int velocityX, int velocityY) &#123;</span><br><span class="line">    // Initiates the decay phase of any active edge effects.</span><br><span class="line">    releaseEdgeEffects();</span><br><span class="line">    // Flings use math in pixels (as opposed to math based on the viewport).</span><br><span class="line">    Point surfaceSize = computeScrollSurfaceSize();</span><br><span class="line">    mScrollerStartViewport.set(mCurrentViewport);</span><br><span class="line">    int startX = (int) (surfaceSize.x * (mScrollerStartViewport.left -</span><br><span class="line">            AXIS_X_MIN) / (</span><br><span class="line">            AXIS_X_MAX - AXIS_X_MIN));</span><br><span class="line">    int startY = (int) (surfaceSize.y * (AXIS_Y_MAX -</span><br><span class="line">            mScrollerStartViewport.bottom) / (</span><br><span class="line">            AXIS_Y_MAX - AXIS_Y_MIN));</span><br><span class="line">    // Before flinging, aborts the current animation.</span><br><span class="line">    mScroller.forceFinished(true);</span><br><span class="line">    // Begins the animation</span><br><span class="line">    mScroller.fling(</span><br><span class="line">            // Current scroll position</span><br><span class="line">            startX,</span><br><span class="line">            startY,</span><br><span class="line">            velocityX,</span><br><span class="line">            velocityY,</span><br><span class="line">            /*</span><br><span class="line">             * Minimum and maximum scroll positions. The minimum scroll</span><br><span class="line">             * position is generally zero and the maximum scroll position</span><br><span class="line">             * is generally the content size less the screen size. So if the</span><br><span class="line">             * content width is 1000 pixels and the screen width is 200  </span><br><span class="line">             * pixels, the maximum scroll offset should be 800 pixels.</span><br><span class="line">             */</span><br><span class="line">            0, surfaceSize.x - mContentRect.width(),</span><br><span class="line">            0, surfaceSize.y - mContentRect.height(),</span><br><span class="line">            // The edges of the content. This comes into play when using</span><br><span class="line">            // the EdgeEffect class to draw &quot;glow&quot; overlays.</span><br><span class="line">            mContentRect.width() / 2,</span><br><span class="line">            mContentRect.height() / 2);</span><br><span class="line">    // Invalidates to trigger computeScroll()</span><br><span class="line">    ViewCompat.postInvalidateOnAnimation(this);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当onFling()调用postInvalidateOnAniamtion(),会触发computeScroll()去更新x,y的值。当一个子视图使用scroller动画显示一个滚动时，通常是必须要做的，就像是在例子中一样。</p>
+<p>Most views pass the scroller object’s x and y position directly to scrollTo(). The following implementation of computeScroll() takes a different approach—it calls computeScrollOffset() to get the current location of x and y. When the criteria for displaying an overscroll “glow” edge effect are met (the display is zoomed in, x or y is out of bounds, and the app isn’t already showing an overscroll), the code sets up the overscroll glow effect and calls postInvalidateOnAnimation() to trigger an invalidate on the view:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br></pre></td><td class="code"><pre><span class="line">// Edge effect / overscroll tracking objects.</span><br><span class="line">private EdgeEffectCompat mEdgeEffectTop;</span><br><span class="line">private EdgeEffectCompat mEdgeEffectBottom;</span><br><span class="line">private EdgeEffectCompat mEdgeEffectLeft;</span><br><span class="line">private EdgeEffectCompat mEdgeEffectRight;</span><br><span class="line"></span><br><span class="line">private boolean mEdgeEffectTopActive;</span><br><span class="line">private boolean mEdgeEffectBottomActive;</span><br><span class="line">private boolean mEdgeEffectLeftActive;</span><br><span class="line">private boolean mEdgeEffectRightActive;</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">public void computeScroll() &#123;</span><br><span class="line">    super.computeScroll();</span><br><span class="line"></span><br><span class="line">    boolean needsInvalidate = false;</span><br><span class="line"></span><br><span class="line">    // The scroller isn&apos;t finished, meaning a fling or programmatic pan</span><br><span class="line">    // operation is currently active.</span><br><span class="line">    if (mScroller.computeScrollOffset()) &#123;</span><br><span class="line">        Point surfaceSize = computeScrollSurfaceSize();</span><br><span class="line">        int currX = mScroller.getCurrX();</span><br><span class="line">        int currY = mScroller.getCurrY();</span><br><span class="line"></span><br><span class="line">        boolean canScrollX = (mCurrentViewport.left &gt; AXIS_X_MIN</span><br><span class="line">                || mCurrentViewport.right &lt; AXIS_X_MAX);</span><br><span class="line">        boolean canScrollY = (mCurrentViewport.top &gt; AXIS_Y_MIN</span><br><span class="line">                || mCurrentViewport.bottom &lt; AXIS_Y_MAX);</span><br><span class="line"></span><br><span class="line">        /*          </span><br><span class="line">         * If you are zoomed in and currX or currY is</span><br><span class="line">         * outside of bounds and you&apos;re not already</span><br><span class="line">         * showing overscroll, then render the overscroll</span><br><span class="line">         * glow edge effect.</span><br><span class="line">         */</span><br><span class="line">        if (canScrollX</span><br><span class="line">                &amp;&amp; currX &lt; 0</span><br><span class="line">                &amp;&amp; mEdgeEffectLeft.isFinished()</span><br><span class="line">                &amp;&amp; !mEdgeEffectLeftActive) &#123;</span><br><span class="line">            mEdgeEffectLeft.onAbsorb((int)</span><br><span class="line">                    OverScrollerCompat.getCurrVelocity(mScroller));</span><br><span class="line">            mEdgeEffectLeftActive = true;</span><br><span class="line">            needsInvalidate = true;</span><br><span class="line">        &#125; else if (canScrollX</span><br><span class="line">                &amp;&amp; currX &gt; (surfaceSize.x - mContentRect.width())</span><br><span class="line">                &amp;&amp; mEdgeEffectRight.isFinished()</span><br><span class="line">                &amp;&amp; !mEdgeEffectRightActive) &#123;</span><br><span class="line">            mEdgeEffectRight.onAbsorb((int)</span><br><span class="line">                    OverScrollerCompat.getCurrVelocity(mScroller));</span><br><span class="line">            mEdgeEffectRightActive = true;</span><br><span class="line">            needsInvalidate = true;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        if (canScrollY</span><br><span class="line">                &amp;&amp; currY &lt; 0</span><br><span class="line">                &amp;&amp; mEdgeEffectTop.isFinished()</span><br><span class="line">                &amp;&amp; !mEdgeEffectTopActive) &#123;</span><br><span class="line">            mEdgeEffectTop.onAbsorb((int)</span><br><span class="line">                    OverScrollerCompat.getCurrVelocity(mScroller));</span><br><span class="line">            mEdgeEffectTopActive = true;</span><br><span class="line">            needsInvalidate = true;</span><br><span class="line">        &#125; else if (canScrollY</span><br><span class="line">                &amp;&amp; currY &gt; (surfaceSize.y - mContentRect.height())</span><br><span class="line">                &amp;&amp; mEdgeEffectBottom.isFinished()</span><br><span class="line">                &amp;&amp; !mEdgeEffectBottomActive) &#123;</span><br><span class="line">            mEdgeEffectBottom.onAbsorb((int)</span><br><span class="line">                    OverScrollerCompat.getCurrVelocity(mScroller));</span><br><span class="line">            mEdgeEffectBottomActive = true;</span><br><span class="line">            needsInvalidate = true;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>Here is the section of the code that performs the actual zoom:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">// Custom object that is functionally similar to Scroller</span><br><span class="line">Zoomer mZoomer;</span><br><span class="line">private PointF mZoomFocalPoint = new PointF();</span><br><span class="line">...</span><br><span class="line"></span><br><span class="line">// If a zoom is in progress (either programmatically or via double</span><br><span class="line">// touch), performs the zoom.</span><br><span class="line">if (mZoomer.computeZoom()) &#123;</span><br><span class="line">    float newWidth = (1f - mZoomer.getCurrZoom()) *</span><br><span class="line">            mScrollerStartViewport.width();</span><br><span class="line">    float newHeight = (1f - mZoomer.getCurrZoom()) *</span><br><span class="line">            mScrollerStartViewport.height();</span><br><span class="line">    float pointWithinViewportX = (mZoomFocalPoint.x -</span><br><span class="line">            mScrollerStartViewport.left)</span><br><span class="line">            / mScrollerStartViewport.width();</span><br><span class="line">    float pointWithinViewportY = (mZoomFocalPoint.y -</span><br><span class="line">            mScrollerStartViewport.top)</span><br><span class="line">            / mScrollerStartViewport.height();</span><br><span class="line">    mCurrentViewport.set(</span><br><span class="line">            mZoomFocalPoint.x - newWidth * pointWithinViewportX,</span><br><span class="line">            mZoomFocalPoint.y - newHeight * pointWithinViewportY,</span><br><span class="line">            mZoomFocalPoint.x + newWidth * (1 - pointWithinViewportX),</span><br><span class="line">            mZoomFocalPoint.y + newHeight * (1 - pointWithinViewportY));</span><br><span class="line">    constrainViewport();</span><br><span class="line">    needsInvalidate = true;</span><br><span class="line">&#125;</span><br><span class="line">if (needsInvalidate) &#123;</span><br><span class="line">    ViewCompat.postInvalidateOnAnimation(this);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>This is the computeScrollSurfaceSize() method that’s called in the above snippet. It computes the current scrollable surface size, in pixels. For example, if the entire chart area is visible, this is simply the current size of mContentRect. If the chart is zoomed in 200% in both directions, the returned size will be twice as large horizontally and vertically.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">private Point computeScrollSurfaceSize() &#123;</span><br><span class="line">    return new Point(</span><br><span class="line">            (int) (mContentRect.width() * (AXIS_X_MAX - AXIS_X_MIN)</span><br><span class="line">                    / mCurrentViewport.width()),</span><br><span class="line">            (int) (mContentRect.height() * (AXIS_Y_MAX - AXIS_Y_MIN)</span><br><span class="line">                    / mCurrentViewport.height()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>For another example of scroller usage, see the source code for the ViewPager class. It scrolls in response to flings, and uses scrolling to implement the “snapping to page” animation.</p>
+
+        
+        </div>
+        <footer class="article-footer">
+            <div class="share-container">
+
+
+
+</div>
+
+    <a data-url="http://yoursite.com/2013/06/19/2013-06-19-animating-scroll-gesture/" data-id="cjdnn3tlt0014rpfygh59b4ud" class="article-share-link"><i class="fa fa-share"></i>Compartir</a>
+<script>
+    (function ($) {
+        // Prevent duplicate binding
+        if (typeof(__SHARE_BUTTON_BINDED__) === 'undefined' || !__SHARE_BUTTON_BINDED__) {
+            __SHARE_BUTTON_BINDED__ = true;
+        } else {
+            return;
+        }
+        $('body').on('click', function() {
+            $('.article-share-box.on').removeClass('on');
+        }).on('click', '.article-share-link', function(e) {
+            e.stopPropagation();
+
+            var $this = $(this),
+                url = $this.attr('data-url'),
+                encodedUrl = encodeURIComponent(url),
+                id = 'article-share-box-' + $this.attr('data-id'),
+                offset = $this.offset(),
+                box;
+
+            if ($('#' + id).length) {
+                box = $('#' + id);
+
+                if (box.hasClass('on')){
+                    box.removeClass('on');
+                    return;
+                }
+            } else {
+                var html = [
+                    '<div id="' + id + '" class="article-share-box">',
+                        '<input class="article-share-input" value="' + url + '">',
+                        '<div class="article-share-links">',
+                            '<a href="https://twitter.com/intent/tweet?url=' + encodedUrl + '" class="fa fa-twitter article-share-twitter" target="_blank" title="Twitter"></a>',
+                            '<a href="https://www.facebook.com/sharer.php?u=' + encodedUrl + '" class="fa fa-facebook article-share-facebook" target="_blank" title="Facebook"></a>',
+                            '<a href="http://pinterest.com/pin/create/button/?url=' + encodedUrl + '" class="fa fa-pinterest article-share-pinterest" target="_blank" title="Pinterest"></a>',
+                            '<a href="https://plus.google.com/share?url=' + encodedUrl + '" class="fa fa-google article-share-google" target="_blank" title="Google+"></a>',
+                        '</div>',
+                    '</div>'
+                ].join('');
+
+              box = $(html);
+
+              $('body').append(box);
+            }
+
+            $('.article-share-box.on').hide();
+
+            box.css({
+                top: offset.top + 25,
+                left: offset.left
+            }).addClass('on');
+
+        }).on('click', '.article-share-box', function (e) {
+            e.stopPropagation();
+        }).on('click', '.article-share-box-input', function () {
+            $(this).select();
+        }).on('click', '.article-share-box-link', function (e) {
+            e.preventDefault();
+            e.stopPropagation();
+
+            window.open(this.href, 'article-share-box-window-' + Date.now(), 'width=500,height=450');
+        });
+    })(jQuery);
+</script>
+
+            
+    
+
+        </footer>
+    </div>
+    
+        
+<nav id="article-nav">
+    
+        <a href="/2013/06/19/2013-06-19-viewpage-intercept/" id="article-nav-newer" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más nuevo</strong>
+            <div class="article-nav-title">
+                
+                    ViewPager TouchEvent流程源码分析
+                
+            </div>
+        </a>
+    
+    
+        <a href="/2013/06/14/2013-06-14-breath/" id="article-nav-older" class="article-nav-link-wrap">
+            <strong class="article-nav-caption">Más viejo</strong>
+            <div class="article-nav-title">呼吸灯特效-使用PropertyAnimation</div>
+        </a>
+    
+</nav>
+
+
+    
+</article>
+
+
+    
+    
+
+</section>
+            
+                
+<aside id="sidebar">
+   
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Recientes</h3>
+        <div class="widget">
+            <ul id="recent-post" class="">
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/2017年年终总结/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/2017年年终总结/" class="title">2017年年终总结</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T21:59:27.000Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2018/02/15/hello-world/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"></p>
+                            <p class="item-title"><a href="/2018/02/15/hello-world/" class="title">Hello World</a></p>
+                            <p class="item-date"><time datetime="2018-02-14T20:49:39.472Z" itemprop="datePublished">2018-02-15</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/11/28/2013-11-28-picasso/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/11/28/2013-11-28-picasso/" class="title">Android Picasso-强大的图片下载缓存类库</a></p>
+                            <p class="item-date"><time datetime="2013-11-27T16:00:00.000Z" itemprop="datePublished">2013-11-28</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/10/30/2013-10-30-display-gif/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/10/30/2013-10-30-display-gif/" class="title">Android中显示动画的GIF-Movie类解决方案</a></p>
+                            <p class="item-date"><time datetime="2013-10-29T16:00:00.000Z" itemprop="datePublished">2013-10-30</time></p>
+                        </div>
+                    </li>
+                
+                    <li>
+                        
+                        <div class="item-thumbnail">
+                            <a href="/2013/08/01/2013-08-01-dynamic_load/" class="thumbnail">
+    
+    
+        <span class="thumbnail-image thumbnail-none"></span>
+    
+</a>
+
+                        </div>
+                        
+                        <div class="item-inner">
+                            <p class="item-category"><a class="article-category-link" href="/categories/Android/">Android</a></p>
+                            <p class="item-title"><a href="/2013/08/01/2013-08-01-dynamic_load/" class="title">Custom Class Loading in Dalvik (译)</a></p>
+                            <p class="item-date"><time datetime="2013-07-31T16:00:00.000Z" itemprop="datePublished">2013-08-01</time></p>
+                        </div>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Categorias</h3>
+        <div class="widget">
+            <ul class="category-list"><li class="category-list-item"><a class="category-list-link" href="/categories/Android/">Android</a><span class="category-list-count">25</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Archivos</h3>
+        <div class="widget">
+            <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2018/02/">February 2018</a><span class="archive-list-count">2</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/11/">November 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/10/">October 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/08/">August 2013</a><span class="archive-list-count">1</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/06/">June 2013</a><span class="archive-list-count">7</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/05/">May 2013</a><span class="archive-list-count">14</span></li><li class="archive-list-item"><a class="archive-list-link" href="/archives/2013/04/">April 2013</a><span class="archive-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Etiquetas</h3>
+        <div class="widget">
+            <ul class="tag-list"><li class="tag-list-item"><a class="tag-list-link" href="/tags/work/">work</a><span class="tag-list-count">1</span></li></ul>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap">
+        <h3 class="widget-title">Nube de etiquetas</h3>
+        <div class="widget tagcloud">
+            <a href="/tags/work/" style="font-size: 10px;">work</a>
+        </div>
+    </div>
+
+    
+        
+    <div class="widget-wrap widget-list">
+        <h3 class="widget-title">Links</h3>
+        <div class="widget">
+            <ul>
+                
+                    <li>
+                        <a href="http://hexo.io">Hexo</a>
+                    </li>
+                
+            </ul>
+        </div>
+    </div>
+
+
+    
+    <div id="toTop" class="fa fa-angle-up"></div>
+</aside>
+
+            
+        </div>
+        <footer id="footer">
+    <div class="outer">
+        <div id="footer-info" class="inner">
+            &copy; 2018 Alin<br>
+            Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Theme by <a href="http://github.com/ppoffice">PPOffice</a>
+        </div>
+    </div>
+</footer>
+        
+
+
+    
+        <script src="/libs/lightgallery/js/lightgallery.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-thumbnail.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-pager.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-autoplay.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-fullscreen.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-zoom.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-hash.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-share.min.js"></script>
+        <script src="/libs/lightgallery/js/lg-video.min.js"></script>
+    
+    
+        <script src="/libs/justified-gallery/jquery.justifiedGallery.min.js"></script>
+    
+    
+
+
+
+<!-- Custom Scripts -->
+<script src="/js/main.js"></script>
+
+    </div>
+</body>
+</html>
